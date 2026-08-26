@@ -1,0 +1,94 @@
+<div class="view-head">
+  <div>
+    <a routerLink="/customer/complaints" class="link-quiet" style="display: inline-flex; align-items: center; gap: 4px; margin-bottom: 8px;">
+      <i class="bi bi-arrow-left"></i> Back to Complaints
+    </a>
+    <h1>Complaint #{{ complaint()?.id || '...' }}</h1>
+  </div>
+</div>
+
+@if (isLoading()) {
+  <div style="padding: 40px; text-align: center; color: var(--muted);">
+    <span class="spinner-border text-primary"></span>
+  </div>
+} @else if (complaint()) {
+  <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+    
+    <div class="panel">
+      <div class="panel-head" style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 style="margin: 0;">Status Tracking</h2>
+        <span class="badge" [ngClass]="getStatusClass(complaint()!.status)" style="font-size: 14px; padding: 6px 12px;">{{ complaint()!.status }}</span>
+      </div>
+      <div style="padding: 24px;">
+        <div style="position: relative; padding-left: 24px; border-left: 2px solid var(--border);">
+           <!-- Timeline items -->
+           <div style="position: relative; margin-bottom: 24px;">
+              <div style="position: absolute; left: -31px; top: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--primary);"></div>
+              <h4 style="margin: 0 0 4px; font-size: 15px;">Complaint Filed</h4>
+              <p style="margin: 0; color: var(--muted); font-size: 13px;">{{ complaint()!.filed }}</p>
+           </div>
+           
+           @if (complaint()!.status === 'In Review' || complaint()!.status === 'Resolved' || complaint()!.status === 'Dismissed') {
+             <div style="position: relative; margin-bottom: 24px;">
+                <div style="position: absolute; left: -31px; top: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--blue);"></div>
+                <h4 style="margin: 0 0 4px; font-size: 15px;">Admin Review Started</h4>
+                <p style="margin: 0; color: var(--muted); font-size: 13px;">Admin has begun investigating your complaint.</p>
+             </div>
+           }
+
+           @if (complaint()!.status === 'Resolved') {
+             <div style="position: relative;">
+                <div style="position: absolute; left: -31px; top: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--green);"></div>
+                <h4 style="margin: 0 0 4px; font-size: 15px;">Resolved</h4>
+                <p style="margin: 0; color: var(--text); font-size: 14px; font-weight: 500;">Resolution: {{ complaint()!.resolutionMessage || 'Issue resolved.' }}</p>
+             </div>
+           } @else if (complaint()!.status === 'Dismissed') {
+             <div style="position: relative;">
+                <div style="position: absolute; left: -31px; top: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--red);"></div>
+                <h4 style="margin: 0 0 4px; font-size: 15px;">Dismissed</h4>
+                <p style="margin: 0; color: var(--text); font-size: 14px; font-weight: 500;">Resolution: {{ complaint()!.resolutionMessage || 'Issue dismissed after review.' }}</p>
+             </div>
+           }
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Complaint Details</h2>
+      </div>
+      <div style="padding: 24px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+          <div>
+             <p style="color: var(--muted); font-size: 13px; margin-bottom: 4px;">Service Provider</p>
+             <div style="font-weight: 600;"><i class="bi bi-person-badge" style="color: var(--primary); margin-right: 8px;"></i>{{ complaint()!.provider }}</div>
+          </div>
+          <div>
+             <p style="color: var(--muted); font-size: 13px; margin-bottom: 4px;">Booking ID</p>
+             <div style="font-weight: 600;"><i class="bi bi-hash" style="color: var(--primary); margin-right: 8px;"></i>{{ complaint()!.bookingId }}</div>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+           <p style="color: var(--muted); font-size: 13px; margin-bottom: 4px;">Reason / Description</p>
+           <div style="background: var(--bg-1); padding: 16px; border-radius: 6px; border: 1px solid var(--border); color: var(--text);">
+             {{ complaint()!.reason }}
+           </div>
+        </div>
+
+        @if (complaint()!.evidenceLink) {
+          <div>
+             <p style="color: var(--muted); font-size: 13px; margin-bottom: 4px;">Evidence Provided</p>
+             <a [href]="complaint()!.evidenceLink" target="_blank" class="btn btn-outline btn-sm"><i class="bi bi-link-45deg"></i> View Evidence</a>
+          </div>
+        }
+      </div>
+    </div>
+    
+  </div>
+} @else {
+  <div class="panel text-center p-5">
+    <h3>Complaint Not Found</h3>
+    <a routerLink="/customer/complaints" class="btn btn-primary mt-3">Back to Complaints</a>
+  </div>
+}

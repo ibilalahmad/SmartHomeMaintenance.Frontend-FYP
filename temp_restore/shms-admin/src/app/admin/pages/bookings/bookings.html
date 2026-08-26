@@ -1,0 +1,57 @@
+<!-- Bookings View -->
+<div class="view-head">
+  <div>
+    <h1>Bookings</h1>
+    <p>Track every booking across confirmed, in progress, and completed states.</p>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="filter-chips">
+    @for (filter of filters; track filter) {
+      <button
+        class="chip"
+        [class.is-active]="activeFilter() === filter"
+        (click)="setFilter(filter)">
+        {{ filter }}
+      </button>
+    }
+  </div>
+</div>
+
+<div class="panel">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Booking ID</th>
+          <th>Customer</th>
+          <th>Provider</th>
+          <th>Service</th>
+          <th>Date &amp; Time</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (b of bookings(); track b.id) {
+          <tr>
+            <td class="cell-title">{{ b.id }}</td>
+            <td>{{ b.customer }}</td>
+            <td>{{ b.provider }}</td>
+            <td>{{ b.service }}</td>
+            <td>{{ b.when }}</td>
+            <td><app-status-badge [status]="b.status"></app-status-badge></td>
+            <td>
+              @if (b.status !== 'Cancelled' && b.status !== 'Completed') {
+                <button class="btn btn-sm btn-outline-danger py-0 px-2" (click)="cancelBooking(b.id)" title="Cancel Booking">
+                  Cancel
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

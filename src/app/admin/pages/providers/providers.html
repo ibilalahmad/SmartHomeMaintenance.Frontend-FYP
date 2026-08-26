@@ -1,0 +1,199 @@
+<!-- Providers View -->
+<div class="view-head">
+  <div>
+    <h1>Service Providers</h1>
+    <p>Approve, monitor, and manage every provider on the platform.</p>
+  </div>
+  <button class="btn btn-primary" (click)="openAddModal()">
+    <i class="bi bi-plus-lg"></i> Add Provider
+  </button>
+</div>
+<ng-template #providerModal>
+  <form (ngSubmit)="submitProvider()" #addForm="ngForm" class="d-flex flex-column gap-3">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Provider Name</label>
+        <input type="text" class="form-control" name="name" [(ngModel)]="newProvider.fullName" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" name="email" [(ngModel)]="newProvider.email">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Phone</label>
+        <input type="text" class="form-control" name="phone" [(ngModel)]="newProvider.phoneNumber">
+      </div>
+      @if (!isEditing) {
+      <div class="col-md-6">
+        <label class="form-label">Password *</label>
+        <input type="password" class="form-control" name="password" [(ngModel)]="newProviderPassword" [required]="!isEditing">
+      </div>
+      }
+      <div class="col-md-6">
+        <label class="form-label">Address</label>
+        <input type="text" class="form-control" name="address" [(ngModel)]="newProvider.address">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Location</label>
+        <input type="text" class="form-control" name="location" [(ngModel)]="newProvider.location">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Expertise</label>
+        <input type="text" class="form-control" name="expertise" [(ngModel)]="newProvider.expertise" required placeholder="e.g. Plumbing">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Qualifications</label>
+        <input type="text" class="form-control" name="qualifications" [(ngModel)]="newProvider.qualification" placeholder="e.g. Master Plumber">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Experience (Years)</label>
+        <input type="number" class="form-control" name="experience" [(ngModel)]="newProvider.workExperience" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Hourly Rate (PKR)</label>
+        <input type="number" class="form-control" name="hourlyRate" [(ngModel)]="newProvider.hourlyRate" required>
+      </div>
+    </div>
+    <div class="d-flex justify-content-end gap-2 mt-2">
+      <button type="button" class="btn btn-light" (click)="closeModal()">Cancel</button>
+      <button type="submit" class="btn btn-primary" [disabled]="!addForm.valid">Save Provider</button>
+    </div>
+  </form>
+</ng-template>
+
+
+<!-- Reject SP Modal -->
+<ng-template #rejectSpModal>
+  <div class="d-flex flex-column gap-3">
+    <p>Please provide a mandatory reason for rejecting the registration of <strong>{{ providerToReject?.fullName }}</strong>. An email notification will be sent to them automatically.</p>
+    <div>
+      <label class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+      <input type="text" class="form-control" name="rejectReason" [(ngModel)]="rejectReason" placeholder="Required" required>
+    </div>
+    <div class="d-flex justify-content-end gap-2 mt-2">
+      <button type="button" class="btn btn-light" (click)="closeModal()">Cancel</button>
+      <button type="button" class="btn btn-danger" (click)="confirmRejectSp()">Reject Registration</button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <div class="search-field search-field--panel">
+    <i class="bi bi-search"></i>
+    <input
+      type="text"
+      placeholder="Search by name, email, expertise, or location…"
+      (input)="onSearch($any($event.target).value)"
+      id="providerSearch">
+  </div>
+  <div class="filter-chips">
+    @for (filter of filters; track filter) {
+      <button
+        class="chip"
+        [class.is-active]="activeFilter() === filter"
+        (click)="setFilter(filter)">
+        {{ filter }}
+      </button>
+    }
+  </div>
+</div>
+
+<!-- Table -->
+<div class="panel">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex align-items-center gap-2">
+      <span class="text-muted small">Show</span>
+      <select class="form-select form-select-sm w-auto" [ngModel]="pageSize()" (ngModelChange)="changePageSize($event)">
+        @for (size of pageSizes; track size) {
+          <option [value]="size">{{ size }}</option>
+        }
+      </select>
+      <span class="text-muted small">entries</span>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width: 60px;">#</th>
+          <th>Provider Info</th>
+          <th>Expertise</th>
+          <th>Experience</th>
+          <th>Rating</th>
+          <th>Reg. Date</th>
+          <th>Status</th>
+          <th>Manage</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of paginatedProviders(); track p.providerId; let i = $index) {
+          <tr>
+            <td class="text-muted">{{ (currentPage() - 1) * pageSize() + i + 1 }}</td>
+            <td>
+              <div class="cell-person">
+                <app-avatar-initials [name]="p.fullName"></app-avatar-initials>
+                <div><div class="cell-title">{{ p.fullName }}</div></div>
+              </div>
+            </td>
+            <td>{{ p.expertise }}</td>
+            <td>{{ p.workExperience }}</td>
+            <td>
+              @if (p.avgRating) {
+                <span class="rating-pill">
+                  <i class="bi bi-star-fill"></i>{{ p.avgRating }}
+                </span>
+              } @else {
+                <span class="cell-sub">—</span>
+              }
+            </td>
+            <td><span class="cell-sub">{{ p.registrationDate ? (p.registrationDate | date:'medium') : '—' }}</span></td>
+            <td><app-status-badge [status]="getProviderStatus(p)"></app-status-badge></td>
+            <td>
+              <div class="d-flex gap-2">
+                @if (getProviderStatus(p) === 'Pending') {
+                  <button class="btn btn-sm btn-outline-success" (click)="approveProvider(p)" title="Approve"><i class="bi bi-check-lg"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="openRejectModal(p)" title="Reject"><i class="bi bi-x-lg"></i></button>
+                } @else {
+                  <button class="btn btn-sm btn-outline-secondary" (click)="toggleBlock(p)" [title]="getProviderStatus(p) === 'Blocked' ? 'Unblock Provider' : 'Block Provider'">
+                    @if (getProviderStatus(p) === 'Blocked') {
+                      <i class="bi bi-unlock"></i> Unblock
+                    } @else {
+                      <i class="bi bi-lock"></i> Block
+                    }
+                  </button>
+                }
+              </div>
+            </td>
+            <td>
+              <div class="d-flex gap-2">
+                <button class="icon-action text-primary" (click)="openEditModal(p)" title="Edit Provider"><i class="bi bi-pencil"></i></button>
+                <a class="icon-action text-info" [routerLink]="['/admin/providers', p.providerId]" title="View Details"><i class="bi bi-eye"></i></a>
+                <button class="icon-action text-danger" (click)="deleteProvider(p.providerId)" title="Delete Provider"><i class="bi bi-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (totalPages() > 1) {
+    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+      <div class="text-muted small">
+        Showing {{ (currentPage() - 1) * pageSize() + 1 }} to {{ Math.min(currentPage() * pageSize(), providers().length) }} of {{ providers().length }} entries
+      </div>
+      <div class="d-flex gap-1">
+        <button class="btn btn-sm btn-outline-secondary" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">Previous</button>
+        @for (page of pageNumbers(); track page) {
+          <button class="btn btn-sm" [class.btn-primary]="currentPage() === page" [class.btn-outline-secondary]="currentPage() !== page" (click)="goToPage(page)">
+            {{ page }}
+          </button>
+        }
+        <button class="btn btn-sm btn-outline-secondary" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">Next</button>
+      </div>
+    </div>
+  }
+</div>

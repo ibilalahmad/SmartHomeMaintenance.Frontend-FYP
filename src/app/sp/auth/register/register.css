@@ -1,0 +1,35 @@
+.register-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--surface-bg);
+  padding: 2rem;
+}
+
+.register-container {
+  background: white;
+  width: 100%;
+  max-width: 800px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  padding: 3rem;
+}
+
+.custom-checkbox-badge input[type="checkbox"]:checked + label {
+  background-color: var(--primary);
+  color: white;
+}
+
+.custom-checkbox-badge label {
+  border-radius: 20px;
+  padding: 0.4rem 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .register-container {
+    padding: 1.5rem;
+  }
+}

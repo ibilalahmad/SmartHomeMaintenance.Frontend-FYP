@@ -1,0 +1,19 @@
+<div class="stat-card">
+  <div class="stat-icon" [class]="iconClass()">
+    <i class="bi {{ icon() }}"></i>
+  </div>
+  <div class="stat-body">
+    <span class="stat-label">{{ label() }}</span>
+    <span class="stat-value">{{ value() }}</span>
+    @if (trend()) {
+      <span class="stat-trend" [class]="trendClass()">
+        @if (trendClass() === 'stat-trend--up') {
+          <i class="bi bi-arrow-up-short"></i>
+        } @else if (trendClass() === 'stat-trend--down') {
+          <i class="bi bi-arrow-down-short"></i>
+        }
+        {{ trend() }}
+      </span>
+    }
+  </div>
+</div>

@@ -1,0 +1,201 @@
+<!-- Dashboard View -->
+<div class="view-head">
+  <div>
+    <h1>Dashboard</h1>
+    <p>Here's what's happening across the platform today.</p>
+  </div>
+  <button class="btn btn-primary is-disabled"><i class="bi bi-download"></i> Export Report</button>
+</div>
+
+<!-- Stat Cards -->
+<section class="stat-grid">
+  <app-stat-card icon="bi-person-badge" iconClass="stat-icon--blue" label="Service Providers"
+    [value]="totalServiceProviders().toString()" trend="8 new this month" trendClass="stat-trend--up">
+  </app-stat-card>
+  <app-stat-card icon="bi-people" iconClass="stat-icon--teal" label="Total Customers"
+    [value]="totalRegisteredCustomers().toString()" trend="54 new this month" trendClass="stat-trend--up">
+  </app-stat-card>
+  <app-stat-card icon="bi-calendar2-check" iconClass="stat-icon--purple" label="Bookings This Month"
+    [value]="totalBookingsThisMonth().toString()" trend="12% up vs last month" trendClass="stat-trend--up" class="is-disabled">
+  </app-stat-card>
+  <app-stat-card icon="bi-hourglass-split" iconClass="stat-icon--amber" label="Pending Approvals"
+    [value]="pendingApprovalsCount().toString()" trend="awaiting admin review" class="is-disabled">
+  </app-stat-card>
+  <app-stat-card icon="bi-flag" iconClass="stat-icon--red" label="Open Complaints"
+    [value]="openComplaintsCount().toString()" trend="2 resolved this week" trendClass="stat-trend--down" class="is-disabled">
+  </app-stat-card>
+  <app-stat-card icon="bi-star-fill" iconClass="stat-icon--amber" label="Avg Platform Rating"
+    [value]="averagePlatformRating().toString()" trend="based on 843 reviews" class="is-disabled">
+  </app-stat-card>
+</section>
+
+
+
+<!-- Charts Row -->
+<section class="grid-charts is-disabled">
+  <!-- Daily Bookings Bar Chart -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Daily Bookings ({{ monthLabel() }})</h2>
+      <div class="segmented">
+        <button (click)="prevMonth()">&laquo; Prev Month</button>
+        <button [class.is-active]="monthOffset() === 0" (click)="nextMonth()" [disabled]="monthOffset() === 0">Next
+          Month &raquo;</button>
+      </div>
+    </div>
+    <div class="bars-chart">
+      @for (d of bookingsByDay(); track d.day) {
+      <div class="bar-col">
+        <div class="bar-stack" [style.height.px]="getBarHeight(d.done) + getBarHeight(d.cancel)">
+          <div class="bar-seg--done" [style.height.px]="getBarHeight(d.done)"></div>
+          <div class="bar-seg--cancel" [style.height.px]="getBarHeight(d.cancel)"></div>
+        </div>
+        <span>{{ d.day }}</span>
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- Bookings by Service -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Bookings by Service</h2>
+    </div>
+    <ul class="legend-list">
+      @for (s of serviceSplit(); track s.name) {
+      <li>
+        <div style="flex:1; min-width: 0;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:2px; min-width: 0; gap: 8px;">
+            <span class="legend-name">
+              <span class="legend-dot" [style.background]="s.color"></span>
+              <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;">{{ s.name
+                }}</span>
+            </span>
+            <span class="legend-pct">{{ s.pct }}%</span>
+          </div>
+          <div class="legend-bar">
+            <div class="legend-bar-fill" [style.width.%]="s.pct" [style.background]="s.color"></div>
+          </div>
+        </div>
+      </li>
+      }
+    </ul>
+  </div>
+</section>
+
+<!-- Providers & Approvals Row -->
+<section class="grid-2 is-disabled">
+  <!-- Pending Approvals -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Pending SP Approvals</h2>
+      <a routerLink="/admin/providers" class="link-quiet">View all</a>
+    </div>
+    <ul class="approval-list">
+      @for (p of pendingApprovals(); track p.name) {
+      <li class="approval-item">
+        <app-avatar-initials [name]="p.name"></app-avatar-initials>
+        <div class="approval-info">
+          <strong>{{ p.name }}</strong>
+          <span>{{ p.expertise }} – applied {{ p.applied !== 'Recently' ? (p.applied | date:'mediumDate') : p.applied }}</span>
+        </div>
+        <div class="approval-actions">
+          <button class="approve-btn" title="Approve" (click)="onApprove(p.name)">
+            <i class="bi bi-check-lg"></i>
+          </button>
+          <button class="reject-btn" title="Reject" (click)="onReject(p.name)">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </li>
+      }
+    </ul>
+  </div>
+
+  <!-- Top Providers -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Top Performing Providers</h2>
+      <a routerLink="/admin/providers" class="link-quiet">View all</a>
+    </div>
+    <ul class="approval-list">
+      @for (p of topProviders(); track p.name; let i = $index) {
+      <li class="approval-item" style="align-items: center;">
+        <div style="font-size: 16px; font-weight: 700; color: var(--muted-2); width: 24px;">#{{ i + 1 }}</div>
+        <app-avatar-initials [name]="p.name"></app-avatar-initials>
+        <div class="approval-info">
+          <strong>{{ p.name }}</strong>
+          <span>{{ p.expertise }}</span>
+        </div>
+        <div class="approval-actions" style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
+          <div style="color: var(--amber); font-weight: 600; font-size: 13px;">
+            <i class="bi bi-star-fill"></i> {{ p.rating }}
+          </div>
+          <div style="font-size: 12px; color: var(--muted);">{{ p.bookings }} bookings</div>
+        </div>
+      </li>
+      }
+    </ul>
+  </div>
+</section>
+
+<!-- Recent Bookings Row (Full Width) -->
+<section class="is-disabled">
+  <!-- Recent Bookings -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Recent Bookings</h2>
+      <a routerLink="/admin/bookings" class="link-quiet">View all</a>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 60px;">#</th>
+            <th>Customer</th>
+            <th>Provider</th>
+            <th>Service</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (b of recentBookings(); track b.customer; let i = $index) {
+          <tr>
+            <td class="text-muted">{{ i + 1 }}</td>
+            <td>{{ b.customer }}</td>
+            <td>
+              <div class="cell-person">
+                <div>
+                  <div class="cell-title">{{ b.provider }}</div>
+                </div>
+              </div>
+            </td>
+            <td>{{ b.service }}</td>
+            <td>{{ b.date | date:'medium' }}</td>
+            <td>
+              <app-status-badge [status]="b.status"></app-status-badge>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<ng-template #rejectModal>
+  <div class="d-flex flex-column gap-3">
+    <p>Please provide a mandatory reason for rejecting the application of <strong>{{ selectedProviderForReject
+        }}</strong>.</p>
+    <div>
+      <label class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+      <input type="text" class="form-control" name="rejectReason" [(ngModel)]="rejectReason" placeholder="Required"
+        required>
+    </div>
+    <div class="d-flex justify-content-end gap-2 mt-2">
+      <button type="button" class="btn btn-light" (click)="cancelReject()">Cancel</button>
+      <button type="button" class="btn btn-danger" (click)="confirmReject()">Reject Application</button>
+    </div>
+  </div>
+</ng-template>

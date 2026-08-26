@@ -1,0 +1,96 @@
+<div class="register-wrapper">
+  <div class="register-container">
+    <div style="text-align: center; margin-bottom: 24px;">
+      <img src="/assets/logo.png" alt="App Logo" style="max-height: 50px;">
+      <h2 style="margin-top: 16px;">Customer Registration</h2>
+      <p style="color: var(--muted);">Join SHMS to easily book home maintenance services.</p>
+    </div>
+
+    @if (errorMessage()) {
+    <div style="padding: 12px; background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--red); color: var(--red); margin-bottom: 24px; border-radius: 4px; display: flex; align-items: center; gap: 8px;">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <div>{{ errorMessage() }}</div>
+    </div>
+    }
+
+    @if (successMessage()) {
+    <div style="padding: 12px; background: rgba(34, 197, 94, 0.1); border-left: 4px solid var(--green); color: var(--green); margin-bottom: 24px; border-radius: 4px; display: flex; align-items: center; gap: 8px;">
+      <i class="bi bi-check-circle-fill"></i>
+      <div>{{ successMessage() }}</div>
+    </div>
+    } @else {
+    <form (ngSubmit)="onSubmit()" #regForm="ngForm">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <!-- Personal Info -->
+        <div style="grid-column: 1 / span 1;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Full Name *</label>
+          <input type="text" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="name" [(ngModel)]="name" required [disabled]="isLoading()">
+        </div>
+        <div style="grid-column: 2 / span 1;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Email Address *</label>
+          <input type="email" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="email" [(ngModel)]="email" required [disabled]="isLoading()">
+        </div>
+        
+        <div style="grid-column: 1 / span 1;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Password *</label>
+          <div style="position: relative;">
+            <input [type]="showPassword ? 'text' : 'password'" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="password" [(ngModel)]="password" required [disabled]="isLoading()">
+            <button type="button" (click)="showPassword = !showPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; padding: 0;">
+              <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+            </button>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+            <small style="color: var(--muted); font-size: 11px;">Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char.</small>
+            <small [style.color]="getPasswordStrength().color" style="font-size: 12px; font-weight: 600;">{{ getPasswordStrength().label }}</small>
+          </div>
+        </div>
+        <div style="grid-column: 2 / span 1;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Confirm Password *</label>
+          <div style="position: relative;">
+            <input [type]="showConfirmPassword ? 'text' : 'password'" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="confirmPassword" [(ngModel)]="confirmPassword" required [disabled]="isLoading()">
+            <button type="button" (click)="showConfirmPassword = !showConfirmPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; padding: 0;">
+              <i class="bi" [class.bi-eye]="!showConfirmPassword" [class.bi-eye-slash]="showConfirmPassword"></i>
+            </button>
+          </div>
+        </div>
+
+        <div style="grid-column: 1 / span 1;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Phone Number *</label>
+          <input type="tel" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="phone" [(ngModel)]="phone" required [disabled]="isLoading()">
+        </div>
+        <div style="grid-column: 2 / span 1;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Address *</label>
+          <input type="text" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="address" [(ngModel)]="address" required [disabled]="isLoading()">
+        </div>
+
+        <div style="grid-column: 1 / span 1;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Default Address (Optional)</label>
+          <input type="text" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="defaultAddress" [(ngModel)]="defaultAddress" [disabled]="isLoading()">
+        </div>
+        <div style="grid-column: 2 / span 1;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Preferred Payment</label>
+          <select style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="preferredPayment" [(ngModel)]="preferredPayment" [disabled]="isLoading()">
+            <option value="Cash on Delivery">Cash on Delivery</option>
+            <option value="Credit Card">Credit Card</option>
+            <option value="Debit Card">Debit Card</option>
+          </select>
+        </div>
+
+        <div style="grid-column: 1 / span 2; margin-top: 16px;">
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;" [disabled]="isLoading() || !regForm.valid">
+            @if (isLoading()) {
+              <span>Creating account...</span>
+            } @else {
+              Register
+            }
+          </button>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 24px; font-size: 14px; color: var(--muted);">
+        <p>Already have an account? <a routerLink="/login" style="color: var(--primary); text-decoration: none; font-weight: 600;">Sign in here</a></p>
+      </div>
+    </form>
+    }
+  </div>
+</div>

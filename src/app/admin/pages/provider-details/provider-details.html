@@ -1,0 +1,163 @@
+<div class="view-head">
+  <div>
+    <h1>Provider Details</h1>
+    <p>Complete information and history for the service provider.</p>
+  </div>
+  <a routerLink="/admin/providers" class="btn btn-outline">
+    <i class="bi bi-arrow-left"></i> Back to Providers
+  </a>
+</div>
+
+@if (provider()) {
+  <div class="panel" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+      <div class="cell-person">
+        @if (provider()?.profilePic) {
+          <img [src]="provider()?.profilePic" alt="Profile Picture" class="cell-avatar" style="width: 64px; height: 64px; object-fit: cover; border-radius: 12px; background: transparent; padding: 0;">
+        } @else {
+          <app-avatar-initials [name]="provider()?.fullName || ''" style="width: 64px; height: 64px; font-size: 24px; border-radius: 12px;"></app-avatar-initials>
+        }
+        <div>
+          <div class="cell-title" style="font-size: 20px;">{{ provider()?.fullName }}</div>
+          <div class="cell-sub" style="font-size: 14px; margin-top: 4px;">{{ provider()?.email }} &bull; {{ provider()?.phoneNumber }}</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <button class="btn btn-outline" style="border-color: var(--border); color: var(--text-dark);" (click)="resetPassword()">
+          <i class="bi bi-key"></i> Reset Password
+        </button>
+        <app-status-badge [status]="provider()?.status || 'Pending'"></app-status-badge>
+      </div>
+    </div>
+
+    <!-- Stats row for info -->
+    <div class="stat-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 0;">
+      <div class="stat-card" style="padding: 16px;">
+        <div class="stat-body">
+          <span class="stat-label">Expertise</span>
+          <span class="stat-value" style="font-size: 16px;">{{ provider()?.expertise }}</span>
+        </div>
+      </div>
+      <div class="stat-card" style="padding: 16px;">
+        <div class="stat-body">
+          <span class="stat-label">Experience</span>
+          <span class="stat-value" style="font-size: 16px;">{{ provider()?.workExperience }}</span>
+        </div>
+      </div>
+      <div class="stat-card" style="padding: 16px;">
+        <div class="stat-body">
+          <span class="stat-label">Location</span>
+          <span class="stat-value" style="font-size: 16px;">{{ provider()?.location }}</span>
+        </div>
+      </div>
+      <div class="stat-card" style="padding: 16px;">
+        <div class="stat-body">
+          <span class="stat-label">Qualifications</span>
+          <span class="stat-value" style="font-size: 16px;">{{ provider()?.qualification || '—' }}</span>
+        </div>
+      </div>
+      <div class="stat-card" style="padding: 16px;">
+        <div class="stat-body">
+          <span class="stat-label">Rating</span>
+          <span class="stat-value" style="font-size: 16px;">
+            @if (provider()?.avgRating) {
+              <span class="rating-pill"><i class="bi bi-star-fill"></i>{{ provider()?.avgRating }}</span>
+            } @else {
+              <span style="color: var(--muted); font-size: 14px; font-weight: normal;">No ratings</span>
+            }
+          </span>
+        </div>
+      </div>
+      <div class="stat-card" style="padding: 16px;">
+        <div class="stat-body">
+          <span class="stat-label">Reg. Date</span>
+          <span class="stat-value" style="font-size: 16px;">{{ provider()?.registrationDate ? (provider()?.registrationDate | date:'medium') : '—' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Recent Remarks</h2>
+      </div>
+      @if (provider()?.remarks && provider()!.remarks!.length > 0) {
+        <ul class="review-list">
+          @for (remark of provider()?.remarks; track remark) {
+            <li style="display: flex; gap: 12px; align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
+              <i class="bi bi-chat-quote" style="color: var(--primary); font-size: 18px;"></i>
+              <span style="font-size: 14px;">{{ remark }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p style="color: var(--muted); font-size: 14px;">No remarks available.</p>
+      }
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Booking History</h2>
+      </div>
+      @if (provider()?.bookingHistory && provider()!.bookingHistory!.length > 0) {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (b of provider()?.bookingHistory; track b.date) {
+                <tr>
+                  <td><div class="cell-title">{{ b.service }}</div></td>
+                  <td><span class="cell-sub">{{ b.date | date:'medium' }}</span></td>
+                  <td>
+                    <span class="badge" 
+                          [class.badge--green]="b.status === 'Completed'" 
+                          [class.badge--amber]="b.status === 'In Progress' || b.status === 'Pending'" 
+                          [class.badge--red]="b.status === 'Cancelled'">
+                      {{ b.status }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p style="color: var(--muted); font-size: 14px;">No booking history available.</p>
+      }
+    </div>
+  </div>
+
+  @if (showPasswordModal) {
+    <div class="modal fade show d-block" tabindex="-1" style="z-index: 1055; background: rgba(0,0,0,0.5);">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Reset Password</h5>
+            <button type="button" class="btn-close" (click)="showPasswordModal = false"></button>
+          </div>
+          <div class="modal-body">
+            <p style="font-size: 14px; margin-bottom: 16px; color: var(--muted);">Set a new temporary password for <strong>{{ provider()?.fullName }}</strong>.</p>
+            <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">New Temporary Password</label>
+            <div style="position: relative;">
+              <input [type]="showPassword ? 'text' : 'password'" class="form-control" [(ngModel)]="newPasswordInput" style="width: 100%; padding: 10px;" placeholder="Enter password...">
+              <button type="button" (click)="showPassword = !showPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; padding: 0;">
+                <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+              </button>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" (click)="showPasswordModal = false">Cancel</button>
+            <button type="button" class="btn btn-primary" (click)="confirmResetPassword()" [disabled]="!newPasswordInput">Confirm Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+}

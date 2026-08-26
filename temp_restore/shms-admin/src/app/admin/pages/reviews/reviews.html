@@ -1,0 +1,47 @@
+<!-- Reviews View -->
+<div class="view-head">
+  <div>
+    <h1>Ratings &amp; Reviews</h1>
+    <p>Monitor customer feedback across all service providers.</p>
+  </div>
+</div>
+
+<section class="grid-2">
+  <!-- Average Rating by Provider -->
+  <div class="panel">
+    <div class="panel-head"><h2>Average Rating by Provider</h2></div>
+    <ul class="rating-list">
+      @for (r of ratings(); track r.name) {
+        <li class="rating-item">
+          <app-avatar-initials [name]="r.name"></app-avatar-initials>
+          <div class="rating-info">
+            <strong>{{ r.name }}</strong>
+            <span class="rating-pill" style="color:var(--muted)">
+              <app-star-rating [rating]="r.rating"></app-star-rating>
+              <span style="color:var(--text); margin-left:4px">{{ r.rating }}</span>
+              <span class="cell-sub">({{ r.count }})</span>
+            </span>
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+
+  <!-- Recent Remarks -->
+  <div class="panel">
+    <div class="panel-head"><h2>Recent Remarks</h2></div>
+    <ul class="review-list">
+      @for (r of reviews(); track r.customer) {
+        <li class="review-item">
+          <div class="review-top">
+            <strong>{{ r.customer }} → {{ r.provider }}</strong>
+            <span class="rating-pill">
+              <app-star-rating [rating]="r.stars"></app-star-rating>
+            </span>
+          </div>
+          <p class="review-text">{{ r.text }}</p>
+        </li>
+      }
+    </ul>
+  </div>
+</section>

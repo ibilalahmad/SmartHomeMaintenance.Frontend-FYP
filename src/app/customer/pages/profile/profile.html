@@ -1,0 +1,154 @@
+<div class="view-head">
+  <div>
+    <h2>My Profile</h2>
+    <p class="text-muted">Manage your personal information and account settings.</p>
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- Profile Info -->
+  <div class="panel">
+    <div class="panel-head">
+      <h3 style="margin: 0; font-size: 16px;">Personal Information</h3>
+    </div>
+    <div style="padding: 24px;">
+      @if (successMessage()) {
+        <div style="padding: 12px; background: rgba(34, 197, 94, 0.1); color: var(--green); border-radius: 6px; margin-bottom: 24px; font-weight: 500; font-size: 14px;">
+          <i class="bi bi-check-circle-fill"></i> {{ successMessage() }}
+        </div>
+      }
+      @if (errorMessage()) {
+        <div style="padding: 12px; background: rgba(239, 68, 68, 0.1); color: var(--red); border-radius: 6px; margin-bottom: 24px; font-weight: 500; font-size: 14px;">
+          <i class="bi bi-exclamation-triangle-fill"></i> {{ errorMessage() }}
+        </div>
+      }
+
+      <div style="position: relative; display: inline-block; margin-bottom: 24px;">
+        @if (profilePic || customer()?.profilePic) {
+          <img [src]="profilePic || customer()?.profilePic" alt="Avatar" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border);">
+        } @else {
+          <i class="bi bi-person-fill" style="font-size: 5rem; color: var(--secondary); display: flex; align-items: center; justify-content: center; width: 100px; height: 100px; border-radius: 50%; background: var(--border);"></i>
+        }
+        <label for="editProfilePicUpload" style="position: absolute; bottom: 0; right: 0; background: var(--primary); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid var(--surface); font-size: 14px; box-shadow: var(--shadow-1);" title="Upload Picture">
+          <i class="bi bi-camera-fill"></i>
+        </label>
+        <input type="file" id="editProfilePicUpload" style="display: none;" accept="image/*" (change)="onProfilePictureSelected($event)" [disabled]="isSaving()">
+      </div>
+
+      <form (ngSubmit)="saveProfile()">
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Email Address (Cannot be changed)</label>
+          <input type="email" class="form-control" style="width: 100%; padding: 10px;" [value]="customer()?.email" disabled>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Full Name</label>
+          <input type="text" class="form-control" style="width: 100%; padding: 10px;" name="editFullName" [(ngModel)]="editFullName" required>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Phone Number</label>
+          <input type="tel" class="form-control" style="width: 100%; padding: 10px;" name="editPhoneNumber" [(ngModel)]="editPhoneNumber" required>
+        </div>
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Address</label>
+          <input type="text" class="form-control" style="width: 100%; padding: 10px;" name="address" [(ngModel)]="address" required>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Default Address</label>
+          <input type="text" class="form-control" style="width: 100%; padding: 10px;" name="defaultAddress" [(ngModel)]="defaultAddress">
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Preferred Payment Method</label>
+          <select class="form-control" style="width: 100%; padding: 10px;" name="preferredPayment" [(ngModel)]="preferredPayment">
+            <option value="Cash on Delivery">Cash on Delivery</option>
+            <option value="Credit Card">Credit Card</option>
+            <option value="Debit Card">Debit Card</option>
+          </select>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+          @if (isSaving()) {
+            <span class="spinner-border spinner-border-sm me-2"></span> Saving...
+          } @else {
+            Save Changes
+          }
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Password & Security -->
+  <div style="display: flex; flex-direction: column; gap: 24px;">
+    <div class="panel">
+      <div class="panel-head">
+        <h3 style="margin: 0; font-size: 16px;">Change Password</h3>
+      </div>
+      <div style="padding: 24px;">
+        
+        @if (pwErrorMessage()) {
+          <div style="padding: 12px; background: rgba(239, 68, 68, 0.1); color: var(--red); border-radius: 6px; margin-bottom: 16px; font-size: 14px;">
+            <i class="bi bi-exclamation-triangle-fill"></i> {{ pwErrorMessage() }}
+          </div>
+        }
+        @if (pwSuccessMessage()) {
+          <div style="padding: 12px; background: rgba(34, 197, 94, 0.1); color: var(--green); border-radius: 6px; margin-bottom: 16px; font-size: 14px;">
+            <i class="bi bi-check-circle-fill"></i> {{ pwSuccessMessage() }}
+          </div>
+        }
+
+        <form>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Current Password</label>
+            <div style="position: relative;">
+              <input [type]="showCurrentPassword ? 'text' : 'password'" class="form-control" style="width: 100%; padding: 10px 40px 10px 12px;" name="currPw" [(ngModel)]="currentPassword" required>
+              <button type="button" (click)="showCurrentPassword = !showCurrentPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; padding: 0;">
+                <i class="bi" [class.bi-eye]="!showCurrentPassword" [class.bi-eye-slash]="showCurrentPassword"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">New Password</label>
+            <div style="position: relative;">
+              <input [type]="showNewPassword ? 'text' : 'password'" class="form-control" style="width: 100%; padding: 10px 40px 10px 12px;" name="newPw" [(ngModel)]="newPassword" required>
+              <button type="button" (click)="showNewPassword = !showNewPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; padding: 0;">
+                <i class="bi" [class.bi-eye]="!showNewPassword" [class.bi-eye-slash]="showNewPassword"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 24px;">
+            <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Confirm New Password</label>
+            <div style="position: relative;">
+              <input [type]="showConfirmPassword ? 'text' : 'password'" class="form-control" style="width: 100%; padding: 10px 40px 10px 12px;" name="confPw" [(ngModel)]="confirmPassword" required>
+              <button type="button" (click)="showConfirmPassword = !showConfirmPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; padding: 0;">
+                <i class="bi" [class.bi-eye]="!showConfirmPassword" [class.bi-eye-slash]="showConfirmPassword"></i>
+              </button>
+            </div>
+          </div>
+          
+          <button type="button" class="btn btn-outline" style="width: 100%;" (click)="changePassword()" [disabled]="isChangingPassword()">
+            @if (isChangingPassword()) {
+              <span class="spinner-border spinner-border-sm me-2"></span> Updating...
+            } @else {
+              Update Password
+            }
+          </button>
+        </form>
+      </div>
+    </div>
+    
+    <div class="panel" style="border-top: 3px solid var(--red);">
+      <div class="panel-head">
+        <h3 style="margin: 0; font-size: 16px; color: var(--red);">Danger Zone</h3>
+      </div>
+      <div style="padding: 24px;">
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">Deactivate or delete your account. This action is irreversible.</p>
+        <button class="btn btn-outline" style="border-color: var(--red); color: var(--red); width: 100%;" (click)="deleteAccount()">Delete Account</button>
+      </div>
+    </div>
+  </div>
+</div>

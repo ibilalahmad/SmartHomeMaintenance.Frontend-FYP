@@ -1,0 +1,71 @@
+<!-- Bookings View -->
+<div class="view-head">
+  <div>
+    <h1>My Bookings</h1>
+    <p>Manage your assigned jobs.</p>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-head" style="gap: 16px;">
+    <h2>Bookings</h2>
+    <div class="segmented">
+      <button [class.is-active]="currentFilter() === 'All'" (click)="filter('All')">All</button>
+      <button [class.is-active]="currentFilter() === 'Pending'" (click)="filter('Pending')">Pending</button>
+      <button [class.is-active]="currentFilter() === 'Confirmed'" (click)="filter('Confirmed')">Confirmed</button>
+      <button [class.is-active]="currentFilter() === 'In Progress'" (click)="filter('In Progress')">In Progress</button>
+      <button [class.is-active]="currentFilter() === 'Completed'" (click)="filter('Completed')">Completed</button>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div style="padding: 40px; text-align: center; color: var(--muted);">
+      Loading bookings...
+    </div>
+  } @else if (filteredBookings().length === 0) {
+    <div style="padding: 40px; text-align: center; color: var(--muted);">
+       <i class="bi bi-calendar-x" style="font-size: 2rem;"></i>
+       <p style="margin-top: 8px;">No bookings found for the selected filter.</p>
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Customer</th>
+            <th>Service</th>
+            <th>Date & Time</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (booking of filteredBookings(); track booking.id) {
+          <tr>
+            <td class="text-muted"><strong>#{{ booking.id }}</strong></td>
+            <td>{{ booking.customer }}</td>
+            <td>{{ booking.service }}</td>
+            <td>{{ booking.when | date:'medium' }}</td>
+            <td>
+               <span class="badge" 
+                     [class.badge--amber]="booking.status === 'Pending'"
+                     [class.badge--blue]="booking.status === 'Confirmed'"
+                     [class.badge--purple]="booking.status === 'In Progress'"
+                     [class.badge--green]="booking.status === 'Completed'"
+                     [class.badge--red]="booking.status === 'Cancelled'">
+                 {{ booking.status }}
+               </span>
+            </td>
+            <td>
+              <a [routerLink]="['/sp/bookings', booking.id]" class="icon-action" title="View Details">
+                <i class="bi bi-chevron-right"></i>
+              </a>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

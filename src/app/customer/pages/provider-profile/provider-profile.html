@@ -1,0 +1,111 @@
+@if (isLoading()) {
+  <div style="text-align: center; padding: 100px;">
+    <span class="spinner-border text-primary"></span>
+  </div>
+} @else if (provider()) {
+  <!-- Back Button -->
+  <a routerLink="/customer/search" style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; color: var(--muted-2); text-decoration: none; font-weight: 500;">
+    <i class="bi bi-arrow-left"></i> Back to Search
+  </a>
+
+  <div class="profile-layout">
+    <!-- Left Column -->
+    <div class="profile-main">
+      <!-- Header / Info Panel -->
+      <div class="panel d-flex gap-4 align-items-center flex-wrap">
+        <div class="profile-avatar">
+          @if (provider()?.profilePic) {
+            <img [src]="provider()?.profilePic" alt="Provider Avatar" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
+          } @else {
+            <i class="bi bi-person-fill" style="font-size: 6rem; color: var(--secondary); display: flex; align-items: center; justify-content: center; width: 120px; height: 120px; border-radius: 50%; background: var(--border);"></i>
+          }
+        </div>
+        <div class="flex-grow-1">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h2 style="margin: 0 0 8px;">{{ provider()?.fullName }}</h2>
+              <div class="text-muted" style="margin-bottom: 12px; font-size: 15px;">{{ provider()?.expertise }}</div>
+            </div>
+            <button class="favorite-btn" (click)="toggleFavorite()" [class.active]="isFavorite()">
+              <i class="bi" [class.bi-heart-fill]="isFavorite()" [class.bi-heart]="!isFavorite()"></i>
+              <span>{{ isFavorite() ? 'Saved' : 'Save to Favorites' }}</span>
+            </button>
+          </div>
+          
+          <div class="provider-badges">
+            <span class="badge bg-success-subtle text-success">
+              <i class="bi bi-check-circle"></i> Verified
+            </span>
+            <span class="badge bg-primary-subtle text-primary">
+              <i class="bi bi-star-fill"></i> {{ provider()?.avgRating || 'New' }}
+            </span>
+            <span class="badge bg-info-subtle text-info">
+              <i class="bi bi-briefcase"></i> {{ provider()?.workExperience }} Exp
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- About & Qualifications -->
+      <div class="panel">
+        <h3 class="panel-title">About & Qualifications</h3>
+        <p style="color: var(--text);">{{ provider()?.qualification || 'No qualifications listed.' }}</p>
+        
+        <h4 style="margin-top: 24px; margin-bottom: 12px; font-size: 15px;">Reviews & Ratings</h4>
+        @if (provider()?.remarks?.length) {
+          <div class="reviews-list">
+            @for (remark of provider()?.remarks; track $index) {
+              <div class="review-item">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <div class="review-avatar">C</div>
+                  <div>
+                    <div style="font-weight: 500; font-size: 14px;">Customer</div>
+                    <div style="color: var(--warning); font-size: 12px;">
+                      <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    </div>
+                  </div>
+                </div>
+                <p style="margin: 0; font-size: 14px; color: var(--muted-2);">"{{ remark }}"</p>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="text-muted">No reviews yet.</p>
+        }
+      </div>
+    </div>
+
+    <!-- Right Column (Sidebar) -->
+    <div class="profile-sidebar">
+      <div class="panel text-center">
+        <!-- FR-CUST-37: View Availability -->
+        <div class="availability-status available mb-4">
+          <i class="bi bi-circle-fill"></i> Available Now
+        </div>
+
+        <button class="btn btn-primary w-100 mb-3 py-3" style="font-size: 16px; font-weight: 600;" (click)="bookNow()">
+          Book Now
+        </button>
+        <p class="text-muted small m-0">Secure booking via SHMS.</p>
+      </div>
+
+      <div class="panel">
+        <h3 class="panel-title" style="margin-bottom: 16px;">Service Area</h3>
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <i class="bi bi-geo-alt text-primary" style="font-size: 20px;"></i>
+          <span style="font-size: 15px; font-weight: 500;">{{ provider()?.location }}</span>
+        </div>
+        <!-- Map Placeholder -->
+        <div class="map-placeholder">
+          <i class="bi bi-map"></i>
+          <span>Map View</span>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="panel text-center p-5">
+    <h3>Provider Not Found</h3>
+    <a routerLink="/customer/search" class="btn btn-primary mt-3">Back to Search</a>
+  </div>
+}

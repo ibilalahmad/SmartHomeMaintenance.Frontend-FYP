@@ -1,0 +1,33 @@
+<div class="view-head">
+  <div>
+    <h1>Notifications</h1>
+    <p>Stay updated with your bookings and platform messages.</p>
+  </div>
+  <button class="btn btn-outline" (click)="markAllRead()"><i class="bi bi-check2-all"></i> Mark All Read</button>
+</div>
+
+<div class="panel">
+  <ul class="approval-list">
+    @for(notif of notifications(); track notif.id) {
+       <li class="approval-item" style="flex-direction: column; align-items: flex-start; padding: 20px; border-left: {{ !notif.read ? '4px solid var(--primary)' : '4px solid transparent' }}; background: {{ !notif.read ? 'var(--bg-1)' : 'transparent' }};">
+          <div style="display: flex; gap: 16px; width: 100%;">
+             <div style="font-size: 24px; color: var(--primary);">
+                <i class="bi {{ getIcon(notif.type) }}"></i>
+             </div>
+             <div style="flex-grow: 1;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                   <h3 style="margin: 0; font-size: 15px; color: var(--text); font-weight: {{ !notif.read ? '600' : '400' }};">{{ notif.title }}</h3>
+                   <span style="font-size: 12px; color: var(--muted);">{{ notif.date | date:'medium' }}</span>
+                </div>
+                <p style="margin: 0; font-size: 14px; color: {{ notif.read ? 'var(--muted)' : 'var(--text)' }};">{{ notif.message }}</p>
+             </div>
+          </div>
+       </li>
+    } @empty {
+       <li style="padding: 60px; text-align: center; color: var(--muted);">
+          <i class="bi bi-bell-slash" style="font-size: 40px; margin-bottom: 16px; display: block;"></i>
+          <p>No notifications yet.</p>
+       </li>
+    }
+  </ul>
+</div>

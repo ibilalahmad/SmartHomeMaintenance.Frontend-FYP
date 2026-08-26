@@ -1,0 +1,126 @@
+<!-- Dashboard View -->
+<div class="view-head">
+  <div>
+    <h1>Dashboard</h1>
+    <p>Welcome back! Here's what's happening today.</p>
+  </div>
+  <div class="btn-row">
+     <a routerLink="/sp/profile" class="btn btn-outline"><i class="bi bi-person"></i> Update Profile</a>
+     <a routerLink="/sp/bookings" class="btn btn-primary is-disabled"><i class="bi bi-calendar"></i> View Bookings</a>
+  </div>
+</div>
+
+<!-- Stat Cards -->
+<section class="stat-grid is-disabled">
+  <div class="stat-card">
+    <div class="stat-icon stat-icon--teal"><i class="bi bi-check2-circle"></i></div>
+    <div class="stat-body">
+      <div class="stat-label">Jobs Completed</div>
+      <div class="stat-value">{{ jobsCompleted() }}</div>
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon stat-icon--green"><i class="bi bi-currency-dollar"></i></div>
+    <div class="stat-body">
+      <div class="stat-label">Earnings</div>
+      <div class="stat-value">PKR {{ earnings() }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon stat-icon--amber"><i class="bi bi-star-fill"></i></div>
+    <div class="stat-body">
+      <div class="stat-label">Avg Rating</div>
+      <div class="stat-value">{{ averageRating() }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon stat-icon--blue"><i class="bi bi-calendar-event"></i></div>
+    <div class="stat-body">
+      <div class="stat-label">Upcoming Jobs</div>
+      <div class="stat-value">{{ upcomingBookings().length }}</div>
+    </div>
+  </div>
+</section>
+
+<!-- Main content grid -->
+<section class="grid-2 is-disabled">
+  <!-- Upcoming Bookings -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Upcoming Bookings</h2>
+      <a routerLink="/sp/bookings" class="link-quiet">View all</a>
+    </div>
+    
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Service</th>
+            <th>When</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(booking of upcomingBookings(); track booking.id) {
+            <tr>
+              <td>{{ booking.customer }}</td>
+              <td>{{ booking.service }}</td>
+              <td>{{ booking.when | date:'short' }}</td>
+              <td>
+                <span class="badge" [class.badge--amber]="booking.status === 'Pending'" [class.badge--blue]="booking.status === 'Confirmed'">{{ booking.status }}</span>
+              </td>
+              <td style="text-align: right;">
+                <a [routerLink]="['/sp/bookings', booking.id]" class="icon-action" title="Details">
+                  <i class="bi bi-chevron-right"></i>
+                </a>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--muted); padding: 20px;">No upcoming bookings.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Recent Ratings -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Recent Ratings</h2>
+      <a routerLink="/sp/ratings" class="link-quiet">View all</a>
+    </div>
+    <ul class="approval-list">
+      <li class="approval-item" style="align-items: center;">
+         <div class="cell-avatar">AT</div>
+         <div class="approval-info">
+            <strong>Ayesha Tariq</strong>
+            <span>"Excellent service! Arrived on time."</span>
+         </div>
+         <div class="approval-actions" style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
+            <div style="color: var(--amber); font-weight: 600; font-size: 13px;">
+              <i class="bi bi-star-fill"></i> 5.0
+            </div>
+         </div>
+      </li>
+      <li class="approval-item" style="align-items: center;">
+         <div class="cell-avatar" style="background: var(--amber-light); color: var(--amber);">UA</div>
+         <div class="approval-info">
+            <strong>Usman Ali</strong>
+            <span>"Good work, but could be cleaner."</span>
+         </div>
+         <div class="approval-actions" style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
+            <div style="color: var(--amber); font-weight: 600; font-size: 13px;">
+              <i class="bi bi-star-fill"></i> 4.0
+            </div>
+         </div>
+      </li>
+    </ul>
+  </div>
+</section>

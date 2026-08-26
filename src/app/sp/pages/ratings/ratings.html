@@ -1,0 +1,91 @@
+<div class="view-head">
+  <div>
+    <h1>Ratings & Remarks</h1>
+    <p>See what customers are saying about your work.</p>
+  </div>
+  <button class="btn btn-primary" (click)="exportPDF()"><i class="bi bi-download"></i> Export Report</button>
+</div>
+
+<section class="grid-2">
+   <div class="panel" style="text-align: center; padding: 40px 24px;">
+      <h1 style="font-size: 64px; color: var(--amber); margin-bottom: 0;">4.8</h1>
+      <div style="color: var(--amber); font-size: 24px; margin-bottom: 8px;">
+         <i class="bi bi-star-fill"></i>
+         <i class="bi bi-star-fill"></i>
+         <i class="bi bi-star-fill"></i>
+         <i class="bi bi-star-fill"></i>
+         <i class="bi bi-star-half"></i>
+      </div>
+      <p style="color: var(--muted); margin-bottom: 24px;">Average Rating from 24 reviews</p>
+      
+      <div style="border-top: 1px solid var(--border); padding-top: 24px; display: flex; flex-direction: column; gap: 12px;">
+         <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px;">
+            <span style="color: var(--text);">5 Stars</span>
+            <div style="flex-grow: 1; margin: 0 16px; height: 8px; background: var(--bg-1); border-radius: 4px; overflow: hidden;">
+               <div style="height: 100%; width: 80%; background: var(--amber);"></div>
+            </div>
+            <span style="color: var(--muted);">19</span>
+         </div>
+         <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px;">
+            <span style="color: var(--text);">4 Stars</span>
+            <div style="flex-grow: 1; margin: 0 16px; height: 8px; background: var(--bg-1); border-radius: 4px; overflow: hidden;">
+               <div style="height: 100%; width: 15%; background: var(--amber);"></div>
+            </div>
+            <span style="color: var(--muted);">4</span>
+         </div>
+         <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px;">
+            <span style="color: var(--text);">3 Stars</span>
+            <div style="flex-grow: 1; margin: 0 16px; height: 8px; background: var(--bg-1); border-radius: 4px; overflow: hidden;">
+               <div style="height: 100%; width: 5%; background: var(--amber);"></div>
+            </div>
+            <span style="color: var(--muted);">1</span>
+         </div>
+      </div>
+   </div>
+
+   <div class="panel">
+      <div class="panel-head">
+         <h2>Customer Remarks</h2>
+         <div class="segmented">
+            <button class="is-active">All Time</button>
+            <button>Last 30 Days</button>
+            <button>Last 3 Months</button>
+         </div>
+      </div>
+
+      <ul class="approval-list">
+         <li class="approval-item" style="flex-direction: column; align-items: flex-start; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 8px;">
+               <div style="display: flex; align-items: center; gap: 12px;">
+                  <div class="cell-avatar">AT</div>
+                  <div>
+                     <strong style="display: block; font-size: 14px; color: var(--text);">Ayesha Tariq</strong>
+                     <span style="color: var(--amber); font-size: 12px; font-weight: 600;"><i class="bi bi-star-fill"></i> 5.0</span>
+                  </div>
+               </div>
+               <span style="font-size: 12px; color: var(--muted);">2 days ago</span>
+            </div>
+            <p style="font-size: 14px; color: var(--text); margin-bottom: 12px;">"Excellent service! Arrived on time and fixed the issue quickly."</p>
+            <div style="background: var(--bg-1); padding: 12px; border-radius: 6px; border-left: 3px solid var(--primary); width: 100%;">
+               <strong style="display: block; font-size: 12px; color: var(--primary); margin-bottom: 4px;">Your Reply</strong>
+               <p style="font-size: 13px; color: var(--muted); margin: 0;">Thank you, Ayesha! I'm glad I could help.</p>
+            </div>
+         </li>
+
+         <li class="approval-item" style="flex-direction: column; align-items: flex-start; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 8px;">
+               <div style="display: flex; align-items: center; gap: 12px;">
+                  <div class="cell-avatar" style="background: var(--amber-light); color: var(--amber);">UA</div>
+                  <div>
+                     <strong style="display: block; font-size: 14px; color: var(--text);">Usman Ali</strong>
+                     <span style="color: var(--amber); font-size: 12px; font-weight: 600;"><i class="bi bi-star-fill"></i> 4.0</span>
+                  </div>
+               </div>
+               <span style="font-size: 12px; color: var(--muted);">1 week ago</span>
+            </div>
+            <p style="font-size: 14px; color: var(--text); margin-bottom: 12px;">"Good work, but could be a bit cleaner after the job."</p>
+            <button class="btn btn-outline" style="padding: 4px 12px; font-size: 12px;"><i class="bi bi-reply"></i> Reply</button>
+         </li>
+      </ul>
+   </div>
+</section>

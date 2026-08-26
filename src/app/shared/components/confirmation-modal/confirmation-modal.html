@@ -1,0 +1,19 @@
+@if (modalService.isOpen()) {
+  <div class="modal fade show d-block" tabindex="-1" style="z-index: 1055; background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ modalService.config()?.title }}</h5>
+          <button type="button" class="btn-close" (click)="modalService.resolve(false)"></button>
+        </div>
+        <div class="modal-body">
+          <p [innerHTML]="modalService.config()?.message"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" (click)="modalService.resolve(false)">{{ modalService.config()?.cancelText }}</button>
+          <button type="button" class="btn btn-{{ modalService.config()?.confirmColor }}" (click)="modalService.resolve(true)">{{ modalService.config()?.confirmText }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

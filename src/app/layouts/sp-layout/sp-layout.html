@@ -1,0 +1,29 @@
+<div class="app-shell">
+
+  <app-sidebar
+    class="sidebar"
+    [class.is-open]="sidebarOpen()"
+    [class.is-collapsed]="sidebarCollapsed()"
+    (navClicked)="closeSidebar()">
+  </app-sidebar>
+
+  <!-- Scrim overlay for mobile — (click) closes sidebar -->
+  <div class="scrim" [class.is-open]="sidebarOpen()" (click)="closeSidebar()"></div>
+
+  <!-- Main content area -->
+  <div class="main">
+    <app-topbar
+      class="topbar"
+      (menuToggle)="openSidebar()">
+    </app-topbar>
+
+    <main class="view-area">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+</div>
+
+<app-toast></app-toast>
+<app-modal></app-modal>
+<app-confirmation-modal></app-confirmation-modal>

@@ -1,0 +1,65 @@
+<div class="view-head">
+  <div>
+    <h2>My Bookings</h2>
+    <p class="text-muted">Manage your upcoming and past service appointments.</p>
+  </div>
+</div>
+
+<div class="panel">
+  <!-- Tabs -->
+  <div class="filter-tabs">
+    <button class="filter-tab" [class.is-active]="currentTab() === 'upcoming'" (click)="setTab('upcoming')">
+      Upcoming & Active
+    </button>
+    <button class="filter-tab" [class.is-active]="currentTab() === 'completed'" (click)="setTab('completed')">
+      Completed
+    </button>
+    <button class="filter-tab" [class.is-active]="currentTab() === 'cancelled'" (click)="setTab('cancelled')">
+      Cancelled
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div style="text-align: center; padding: 40px; color: var(--muted);">
+      <span class="spinner-border text-primary" role="status"></span>
+    </div>
+  } @else {
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Service Provider</th>
+            <th>Service</th>
+            <th>Date & Time</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (b of getFilteredBookings(); track b.id) {
+            <tr>
+              <td><span style="font-family: monospace; color: var(--muted-2);">{{ b.id }}</span></td>
+              <td style="font-weight: 500;">{{ b.provider }}</td>
+              <td>{{ b.service }}</td>
+              <td>{{ b.when | date:'MMM d, y, h:mm a' }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="getStatusClass(b.status)">{{ b.status }}</span>
+              </td>
+              <td>
+                <a [routerLink]="['/customer/bookings', b.id]" class="btn btn-outline btn-sm">View Details</a>
+              </td>
+            </tr>
+          }
+          @if (getFilteredBookings().length === 0) {
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 40px; color: var(--muted-2);">
+                No bookings found in this category.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

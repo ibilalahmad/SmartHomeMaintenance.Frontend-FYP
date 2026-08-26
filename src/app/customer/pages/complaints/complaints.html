@@ -1,0 +1,117 @@
+<div class="view-head">
+  <div>
+    <h2>Complaints & Issues</h2>
+    <p class="text-muted">File a complaint or track the status of your existing issues.</p>
+  </div>
+  <div>
+    @if (!showForm) {
+      <button class="btn btn-primary" (click)="showForm = true">File New Complaint</button>
+    }
+  </div>
+</div>
+
+@if (successMessage()) {
+  <div style="padding: 16px; background: rgba(34, 197, 94, 0.1); border: 1px solid var(--green); color: var(--green); margin-bottom: 24px; border-radius: 8px; display: flex; align-items: center; gap: 12px; font-weight: 500;">
+    <i class="bi bi-check-circle-fill" style="font-size: 20px;"></i>
+    <div>{{ successMessage() }}</div>
+  </div>
+}
+
+@if (showForm) {
+  <div class="panel" style="margin-bottom: 24px; max-width: 800px; padding: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <h3 style="margin: 0;">File a Complaint</h3>
+      <button class="btn btn-outline btn-sm" (click)="showForm = false; errorMessage.set('');">Cancel</button>
+    </div>
+
+    @if (errorMessage()) {
+    <div style="padding: 12px; background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--red); color: var(--red); margin-bottom: 24px; border-radius: 4px; display: flex; align-items: center; gap: 8px;">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <div>{{ errorMessage() }}</div>
+    </div>
+    }
+
+    <form (ngSubmit)="onSubmit()" #compForm="ngForm">
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Related Booking *</label>
+        <select class="form-control" style="width: 100%; padding: 10px;" name="booking" [(ngModel)]="selectedBookingId" required>
+          <option value="" disabled selected>Select a booking</option>
+          @for (b of bookings(); track b.id) {
+            <option [value]="b.id">{{ b.service }} by {{ b.provider }} ({{ b.id }})</option>
+          }
+        </select>
+        @if (bookings().length === 0) {
+          <small class="text-muted">You do not have any eligible bookings to complain about.</small>
+        }
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Complaint Reason / Description *</label>
+        <textarea class="form-control" style="width: 100%; padding: 10px;" rows="4" name="reason" [(ngModel)]="reason" placeholder="Explain the issue in detail (Misbehaviour, Unsatisfactory work, Overcharging, etc.)" required></textarea>
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Evidence Link (Optional)</label>
+        <input type="url" class="form-control" style="width: 100%; padding: 10px;" name="evidence" [(ngModel)]="evidenceLink" placeholder="Link to photos or documents (e.g. Google Drive link)">
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="isSubmitting() || !compForm.valid || bookings().length === 0">
+        @if (isSubmitting()) {
+          <span class="spinner-border spinner-border-sm me-2"></span> Submitting...
+        } @else {
+          Submit Complaint
+        }
+      </button>
+    </form>
+  </div>
+}
+
+<div class="panel">
+  <div class="panel-head">
+    <h3 style="margin: 0; font-size: 16px;">Your Complaints</h3>
+  </div>
+
+  @if (isLoading()) {
+    <div style="text-align: center; padding: 40px; color: var(--muted);">
+      <span class="spinner-border text-primary" role="status"></span>
+    </div>
+  } @else {
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Booking ID</th>
+            <th>Provider</th>
+            <th>Filed On</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of complaints(); track c.id) {
+            <tr>
+              <td><span style="font-family: monospace; color: var(--muted-2);">{{ c.id }}</span></td>
+              <td>{{ c.bookingId }}</td>
+              <td style="font-weight: 500;">{{ c.provider }}</td>
+              <td>{{ c.filed }}</td>
+              <td>
+                <span class="badge" [ngClass]="getStatusClass(c.status)">{{ c.status }}</span>
+              </td>
+              <td>
+                <a [routerLink]="['/customer/complaints', c.id]" class="btn btn-outline btn-sm">Track Status</a>
+              </td>
+            </tr>
+          }
+          @if (complaints().length === 0) {
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 40px; color: var(--muted-2);">
+                You have not filed any complaints.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

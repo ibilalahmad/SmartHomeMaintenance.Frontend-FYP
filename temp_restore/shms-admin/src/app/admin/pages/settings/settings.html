@@ -1,0 +1,35 @@
+<!-- Settings View -->
+<div class="view-head">
+  <div>
+    <h1>Settings</h1>
+    <p>Manage your admin profile and account security.</p>
+  </div>
+</div>
+
+<div class="panel panel--form">
+  <div class="form-row">
+    <label for="settingsFullName">Full Name</label>
+    <input
+      id="settingsFullName"
+      type="text"
+      [(ngModel)]="fullName"
+      placeholder="Full name">
+  </div>
+  <div class="form-row">
+    <label for="settingsEmail">Email</label>
+    <input
+      id="settingsEmail"
+      type="email"
+      [(ngModel)]="email"
+      placeholder="Email address">
+  </div>
+  <div class="form-row">
+    <label for="settingsPassword">Change Password</label>
+    <input
+      id="settingsPassword"
+      type="password"
+      [(ngModel)]="password"
+      placeholder="New password">
+  </div>
+  <button class="btn btn-primary" (click)="saveChanges()">Save Changes</button>
+</div>

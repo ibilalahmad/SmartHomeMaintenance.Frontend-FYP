@@ -1,0 +1,35 @@
+<!-- Mobile hamburger -->
+<button class="icon-btn menu-toggle" aria-label="Toggle menu" (click)="onMenuClick()">
+  <i class="bi bi-list"></i>
+</button>
+
+<!-- Global search -->
+<div class="search-field">
+  <i class="bi bi-search"></i>
+  <input type="text" placeholder="Search providers or services" id="globalSearch">
+</div>
+
+<!-- Right-side actions -->
+<div class="topbar-actions">
+  <button class="icon-btn" aria-label="Notifications" routerLink="/customer/notifications">
+    <i class="bi bi-bell"></i>
+    <span class="dot"></span>
+  </button>
+
+  <div class="dropdown">
+    <div class="admin-chip" data-bs-toggle="dropdown" style="cursor: pointer;">
+      <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+        {{ authService.currentCustomer()?.fullName?.charAt(0) || 'C' }}
+      </div>
+      <div class="admin-chip-text">
+        <strong>{{ authService.currentCustomer()?.fullName || 'Customer' }}</strong>
+        <small>Customer</small>
+      </div>
+      <i class="bi bi-chevron-down"></i>
+    </div>
+    <ul class="dropdown-menu dropdown-menu-end">
+      <li><a class="dropdown-item" routerLink="/customer/profile"><i class="bi bi-person me-2"></i> Profile</a></li>
+      <li><button class="dropdown-item text-danger" (click)="onLogout()"><i class="bi bi-box-arrow-left me-2"></i> Log Out</button></li>
+    </ul>
+  </div>
+</div>

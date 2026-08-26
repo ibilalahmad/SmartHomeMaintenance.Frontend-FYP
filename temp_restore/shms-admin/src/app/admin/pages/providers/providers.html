@@ -1,0 +1,109 @@
+<!-- Providers View -->
+<div class="view-head">
+  <div>
+    <h1>Service Providers</h1>
+    <p>Approve, monitor, and manage every provider on the platform.</p>
+  </div>
+  <button class="btn btn-primary" (click)="toggleAddForm()">
+    <i class="bi bi-plus-lg"></i> {{ showAddForm() ? 'Cancel' : 'Add Provider' }}
+  </button>
+</div>
+
+@if (showAddForm()) {
+  <div class="panel panel--form mb-4">
+    <h3 class="mb-3" style="font-size: 16px; font-weight: 600;">New Provider</h3>
+    <form (ngSubmit)="submitProvider()" #addForm="ngForm" class="d-flex flex-column gap-3">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Provider Name</label>
+          <input type="text" class="form-control" name="name" [(ngModel)]="newProvider.name" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Expertise</label>
+          <input type="text" class="form-control" name="expertise" [(ngModel)]="newProvider.expertise" placeholder="e.g. Plumbing, Electrical" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Experience</label>
+          <input type="text" class="form-control" name="experience" [(ngModel)]="newProvider.experience" placeholder="e.g. 5 yrs" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Status</label>
+          <select class="form-select" name="status" [(ngModel)]="newProvider.status">
+            <option value="Active">Active</option>
+            <option value="Pending">Pending</option>
+            <option value="Blocked">Blocked</option>
+          </select>
+        </div>
+      </div>
+      <div class="d-flex justify-content-end gap-2 mt-2">
+        <button type="button" class="btn btn-light" (click)="toggleAddForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!addForm.valid">Save Provider</button>
+      </div>
+    </form>
+  </div>
+}
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <div class="search-field search-field--panel">
+    <i class="bi bi-search"></i>
+    <input
+      type="text"
+      placeholder="Search by name or expertise…"
+      (input)="onSearch($any($event.target).value)"
+      id="providerSearch">
+  </div>
+  <div class="filter-chips">
+    @for (filter of filters; track filter) {
+      <button
+        class="chip"
+        [class.is-active]="activeFilter() === filter"
+        (click)="setFilter(filter)">
+        {{ filter }}
+      </button>
+    }
+  </div>
+</div>
+
+<!-- Table -->
+<div class="panel">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Provider</th>
+          <th>Expertise</th>
+          <th>Experience</th>
+          <th>Rating</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of providers(); track p.name) {
+          <tr>
+            <td>
+              <div class="cell-person">
+                <app-avatar-initials [name]="p.name"></app-avatar-initials>
+                <div><div class="cell-title">{{ p.name }}</div></div>
+              </div>
+            </td>
+            <td>{{ p.expertise }}</td>
+            <td>{{ p.experience }}</td>
+            <td>
+              @if (p.rating) {
+                <span class="rating-pill">
+                  <i class="bi bi-star-fill"></i>{{ p.rating }}
+                </span>
+              } @else {
+                <span class="cell-sub">—</span>
+              }
+            </td>
+            <td><app-status-badge [status]="p.status"></app-status-badge></td>
+            <td><button class="icon-action"><i class="bi bi-three-dots"></i></button></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

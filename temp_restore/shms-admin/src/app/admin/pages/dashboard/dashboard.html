@@ -1,0 +1,152 @@
+<!-- Dashboard View -->
+<div class="view-head">
+  <div>
+    <h1>Dashboard</h1>
+    <p>Here's what's happening across the platform today.</p>
+  </div>
+  <button class="btn btn-primary"><i class="bi bi-download"></i> Export Report</button>
+</div>
+
+<!-- Stat Cards -->
+<section class="stat-grid">
+  <app-stat-card
+    icon="bi-person-badge"
+    iconClass="stat-icon--blue"
+    label="Service Providers"
+    value="128"
+    trend="8 this month"
+    trendClass="stat-trend--up">
+  </app-stat-card>
+  <app-stat-card
+    icon="bi-people"
+    iconClass="stat-icon--teal"
+    label="Customers"
+    value="942"
+    trend="54 this month"
+    trendClass="stat-trend--up">
+  </app-stat-card>
+  <app-stat-card
+    icon="bi-hourglass-split"
+    iconClass="stat-icon--amber"
+    label="Pending Approvals"
+    value="6"
+    trend="awaiting review">
+  </app-stat-card>
+  <app-stat-card
+    icon="bi-flag"
+    iconClass="stat-icon--red"
+    label="Open Complaints"
+    value="3"
+    trend="2 resolved this week"
+    trendClass="stat-trend--down">
+  </app-stat-card>
+</section>
+
+<!-- Charts Row -->
+<section class="grid-2">
+  <!-- Monthly Bookings Bar Chart -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Monthly Bookings</h2>
+      <div class="segmented">
+        <button [class.is-active]="selectedPeriod() === '6m'" (click)="selectedPeriod.set('6m')">6 Months</button>
+        <button [class.is-active]="selectedPeriod() === '1y'" (click)="selectedPeriod.set('1y')">1 Year</button>
+      </div>
+    </div>
+    <div class="bars-chart">
+      @for (d of bookingsByMonth(); track d.m) {
+        <div class="bar-col">
+          <div class="bar-stack" [style.height.px]="getBarHeight(d.done) + getBarHeight(d.cancel)">
+            <div class="bar-seg--done"   [style.height.px]="getBarHeight(d.done)"></div>
+            <div class="bar-seg--cancel" [style.height.px]="getBarHeight(d.cancel)"></div>
+          </div>
+          <span>{{ d.m }}</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Bookings by Service -->
+  <div class="panel">
+    <div class="panel-head"><h2>Bookings by Service</h2></div>
+    <ul class="legend-list">
+      @for (s of serviceSplit(); track s.name) {
+        <li>
+          <div style="flex:1">
+            <div style="display:flex; justify-content:space-between; margin-bottom:2px">
+              <span class="legend-name">
+                <span class="legend-dot" [style.background]="s.color"></span> {{ s.name }}
+              </span>
+              <span class="legend-pct">{{ s.pct }}%</span>
+            </div>
+            <div class="legend-bar">
+              <div class="legend-bar-fill" [style.width.%]="s.pct" [style.background]="s.color"></div>
+            </div>
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+</section>
+
+<!-- Tables Row -->
+<section class="grid-2">
+  <!-- Recent Bookings -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Recent Bookings</h2>
+      <a routerLink="/admin/bookings" class="link-quiet">View all</a>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Provider</th>
+            <th>Service</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (b of recentBookings(); track b.customer) {
+            <tr>
+              <td>{{ b.customer }}</td>
+              <td>{{ b.provider }}</td>
+              <td>{{ b.service }}</td>
+              <td>{{ b.date }}</td>
+              <td><app-status-badge [status]="b.status"></app-status-badge></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pending Approvals -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Pending SP Approvals</h2>
+      <a routerLink="/admin/providers" class="link-quiet">View all</a>
+    </div>
+    <ul class="approval-list">
+      @for (p of pendingApprovals(); track p.name) {
+        <li class="approval-item">
+          <app-avatar-initials [name]="p.name"></app-avatar-initials>
+          <div class="approval-info">
+            <strong>{{ p.name }}</strong>
+            <span>{{ p.expertise }} · applied {{ p.applied }}</span>
+          </div>
+          <div class="approval-actions">
+            <button class="approve-btn" title="Approve" (click)="onApprove(p.name)">
+              <i class="bi bi-check-lg"></i>
+            </button>
+            <button class="reject-btn" title="Reject" (click)="onReject(p.name)">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,89 @@
+<!-- Reports & Analytics View -->
+<div class="view-head">
+  <div>
+    <h1>Reports &amp; Analytics</h1>
+    <p>Monthly performance across bookings, providers, and customers.</p>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-outline" (click)="exportToPDF()"><i class="bi bi-filetype-pdf"></i> Export PDF</button>
+    <button class="btn btn-outline" (click)="exportToExcel()"><i class="bi bi-filetype-xlsx"></i> Export Excel</button>
+  </div>
+</div>
+
+@if (bookingSummary()) {
+  <section class="stat-grid mb-4">
+    <app-stat-card icon="bi-calendar2-check" iconClass="stat-icon--blue" label="Total Bookings" [value]="bookingSummary()!.total.toString()"></app-stat-card>
+    <app-stat-card icon="bi-check2-circle" iconClass="stat-icon--teal" label="Completed Bookings" [value]="bookingSummary()!.completed.toString()"></app-stat-card>
+    <app-stat-card icon="bi-x-circle" iconClass="stat-icon--red" label="Cancelled Bookings" [value]="bookingSummary()!.cancelled.toString()"></app-stat-card>
+    <app-stat-card icon="bi-hourglass-split" iconClass="stat-icon--amber" label="Pending Bookings" [value]="bookingSummary()!.pending.toString()"></app-stat-card>
+    <app-stat-card icon="bi-graph-up-arrow" iconClass="stat-icon--purple" label="Success Rate" [value]="bookingSummary()!.successRate.toString() + '%'"></app-stat-card>
+  </section>
+}
+
+<div class="panel mb-4">
+  <div class="d-flex flex-wrap gap-4 align-items-end">
+    <div>
+      <label class="form-label">Report Type</label>
+      <select class="form-select" [ngModel]="selectedReportType()" (ngModelChange)="selectedReportType.set($event)">
+        <option value="SPPerformance">Service Provider Performance</option>
+        <option value="CustomerActivity">Customer Activity</option>
+      </select>
+    </div>
+    <div>
+      <label class="form-label">Start Date</label>
+      <input type="date" class="form-control" [ngModel]="startDate()" (ngModelChange)="startDate.set($event)">
+    </div>
+    <div>
+      <label class="form-label">End Date</label>
+      <input type="date" class="form-control" [ngModel]="endDate()" (ngModelChange)="endDate.set($event)">
+    </div>
+    <div>
+      <button class="btn btn-primary" (click)="generateReport()">Generate Detailed Report</button>
+    </div>
+  </div>
+</div>
+
+@if (spPerformance().length > 0) {
+  <div class="panel">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 60px;">#</th>
+            <th>Provider Name</th>
+            <th>Completed Jobs</th>
+            <th>Avg. Rating</th>
+            <th>Complaints</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (sp of spPerformance(); track sp.id; let i = $index) {
+            <tr>
+              <td class="text-muted">{{ i + 1 }}</td>
+              <td><strong>{{ sp.name }}</strong></td>
+              <td>{{ sp.completedJobs }}</td>
+              <td>
+                <span class="rating-pill">
+                  <app-star-rating [rating]="sp.averageRating"></app-star-rating>
+                  <span class="ms-1">{{ sp.averageRating }}</span>
+                </span>
+              </td>
+              <td>{{ sp.complaintsReceived }}</td>
+              <td><app-status-badge [status]="sp.status"></app-status-badge></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
+
+@if (customerSummary()) {
+  <section class="stat-grid">
+    <app-stat-card icon="bi-people" iconClass="stat-icon--blue" label="Total Registered Customers" [value]="customerSummary()!.totalRegistered.toString()"></app-stat-card>
+    <app-stat-card icon="bi-person-check" iconClass="stat-icon--teal" label="Active Customers (Last 3 Months)" [value]="customerSummary()!.activeLast3Months.toString()"></app-stat-card>
+    <app-stat-card icon="bi-card-list" iconClass="stat-icon--purple" label="Total Bookings Made" [value]="customerSummary()!.totalBookings.toString()"></app-stat-card>
+    <app-stat-card icon="bi-pie-chart" iconClass="stat-icon--amber" label="Avg Bookings / Customer" [value]="customerSummary()!.averageBookingsPerCustomer.toString()"></app-stat-card>
+  </section>
+}

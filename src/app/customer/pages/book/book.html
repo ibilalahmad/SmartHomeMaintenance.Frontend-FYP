@@ -1,0 +1,82 @@
+@if (isLoading()) {
+  <div style="text-align: center; padding: 100px;">
+    <span class="spinner-border text-primary"></span>
+  </div>
+} @else if (provider()) {
+  <div class="view-head">
+    <div>
+      <a [routerLink]="['/customer/provider', provider()?.providerId]" style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 8px; color: var(--muted-2); text-decoration: none; font-weight: 500; font-size: 14px;">
+        <i class="bi bi-arrow-left"></i> Back to Profile
+      </a>
+      <h2>Book Service</h2>
+      <p class="text-muted">You are booking an appointment with <strong>{{ provider()?.fullName }}</strong>.</p>
+    </div>
+  </div>
+
+  <div class="panel" style="max-width: 600px; margin: 0 auto; padding: 24px;">
+    @if (errorMessage()) {
+    <div style="padding: 12px; background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--red); color: var(--red); margin-bottom: 24px; border-radius: 4px; display: flex; align-items: center; gap: 8px;">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <div>{{ errorMessage() }}</div>
+    </div>
+    }
+
+    <form (ngSubmit)="onSubmit()" #bookForm="ngForm">
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        
+        <div>
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Select Service Type *</label>
+          <select class="form-control" style="width: 100%; padding: 10px;" name="serviceType" [(ngModel)]="serviceType" required>
+            <option value="" disabled selected>Select a service</option>
+            @for (srv of availableServices; track srv) {
+              <option [value]="srv">{{ srv }}</option>
+            }
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Date *</label>
+            <input type="date" class="form-control" style="width: 100%; padding: 10px;" name="date" [(ngModel)]="date" required>
+          </div>
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Time Slot *</label>
+            <select class="form-control" style="width: 100%; padding: 10px;" name="time" [(ngModel)]="time" required>
+              <option value="" disabled selected>Select time</option>
+              <option value="09:00 AM">09:00 AM - 10:00 AM</option>
+              <option value="10:00 AM">10:00 AM - 11:00 AM</option>
+              <option value="11:00 AM">11:00 AM - 12:00 PM</option>
+              <option value="01:00 PM">01:00 PM - 02:00 PM</option>
+              <option value="02:00 PM">02:00 PM - 03:00 PM</option>
+              <option value="03:00 PM">03:00 PM - 04:00 PM</option>
+              <option value="04:00 PM">04:00 PM - 05:00 PM</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Service Address *</label>
+          <input type="text" class="form-control" style="width: 100%; padding: 10px;" name="address" [(ngModel)]="address" placeholder="Enter your full address" required>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Issue Description (Optional)</label>
+          <textarea class="form-control" style="width: 100%; padding: 10px;" rows="4" name="instructions" [(ngModel)]="instructions" placeholder="Describe the problem or any special instructions for the provider..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="padding: 12px; font-size: 16px; margin-top: 8px;" [disabled]="isSubmitting() || !bookForm.valid">
+          @if (isSubmitting()) {
+            <span class="spinner-border spinner-border-sm me-2"></span> Confirming...
+          } @else {
+            Confirm Booking
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+} @else {
+  <div class="panel text-center p-5">
+    <h3>Provider Not Found</h3>
+    <a routerLink="/customer/search" class="btn btn-primary mt-3">Back to Search</a>
+  </div>
+}

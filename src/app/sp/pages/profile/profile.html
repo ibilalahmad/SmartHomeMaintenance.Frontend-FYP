@@ -1,0 +1,204 @@
+<div class="view-head">
+  <div>
+    <h1>My Profile</h1>
+    <p>Manage your personal information and availability.</p>
+  </div>
+  <div class="btn-row">
+     <button class="btn btn-outline" (click)="toggleAvailability()">
+        <i class="bi bi-power"></i> Toggle Availability
+     </button>
+     <button class="btn" [class.btn-primary]="!isEditing()" [class.btn-outline]="isEditing()" (click)="toggleEdit()">
+        @if(isEditing()){
+           <i class="bi bi-x-circle me-1"></i> Cancel
+        } @else {
+           <i class="bi bi-pencil me-1"></i> Edit Profile
+        }
+     </button>
+  </div>
+</div>
+
+@if (profile()) {
+<!-- Avatar / Header Card (Full Width) -->
+<div class="panel" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; margin-bottom: 24px;">
+  <div style="position: relative; display: inline-block; margin-bottom: 16px;">
+    @if (isEditing() && editProfilePic) {
+      <img [src]="editProfilePic" alt="Avatar" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
+    } @else if (profile()?.profilePic) {
+      <img [src]="profile()!.profilePic" alt="Avatar" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
+    } @else {
+      <i class="bi bi-person-fill" style="font-size: 5rem; color: var(--secondary); display: flex; align-items: center; justify-content: center; width: 120px; height: 120px; border-radius: 50%; background: var(--border);"></i>
+    }
+    @if (isEditing()) {
+      <label for="profilePicUpload" style="position: absolute; bottom: 0; right: 0; background: var(--primary); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid var(--surface); font-size: 16px; box-shadow: var(--shadow-1);" title="Upload Picture">
+        <i class="bi bi-camera-fill"></i>
+      </label>
+      <input type="file" id="profilePicUpload" style="display: none;" accept="image/*" (change)="onProfilePictureSelected($event)" [disabled]="isLoading()">
+    }
+  </div>
+  <h2 style="margin-bottom: 8px;">{{ profile()!.fullName }}</h2>
+  <p style="color: var(--muted); margin-bottom: 16px;">{{ profile()!.expertise }}</p>
+  
+  <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: 24px;">
+     <span class="badge badge--blue">{{ profile()!.status }}</span>
+     <span class="badge badge--amber"><i class="bi bi-star-fill"></i> {{ profile()!.avgRating || 'New' }}</span>
+  </div>
+  
+  <div style="display: flex; gap: 24px; font-size: 14px; color: var(--muted); flex-wrap: wrap; justify-content: center;">
+    <div><i class="bi bi-geo-alt" style="margin-right: 8px;"></i> {{ profile()!.address || profile()!.location }}</div>
+    <div><i class="bi bi-cash" style="margin-right: 8px;"></i> PKR {{ profile()!.hourlyRate || 0 }}/hr</div>
+    <div><i class="bi bi-envelope" style="margin-right: 8px;"></i> {{ profile()!.email }}</div>
+    <div><i class="bi bi-telephone" style="margin-right: 8px;"></i> {{ profile()!.phoneNumber }}</div>
+  </div>
+</div>
+
+<section class="grid-2">
+  <!-- Left Column: Personal Information -->
+  <div style="display: flex; flex-direction: column; gap: 24px;">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Personal Information</h2>
+      </div>
+      <div style="padding: 24px;">
+      @if (successMessage()) {
+        <div class="alert alert-success" style="padding: 12px; margin-bottom: 16px; border-radius: 6px; background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid rgba(16,185,129,0.2); font-size: 14px;">
+          <i class="bi bi-check-circle-fill me-2"></i> {{ successMessage() }}
+        </div>
+      }
+      @if (errorMessage()) {
+        <div class="alert alert-danger" style="padding: 12px; margin-bottom: 16px; border-radius: 6px; background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.2); font-size: 14px;">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage() }}
+        </div>
+      }
+      
+      @if (!isEditing()) {
+      <div style="display: grid; grid-template-columns: 140px 1fr; gap: 16px; font-size: 14px;">
+        <div style="color: var(--muted);">Qualification</div>
+        <div style="color: var(--text);">{{ profile()!.qualification || profile()!.qualification || 'Not specified' }}</div>
+        
+        <div style="color: var(--muted);">Experience (Years)</div>
+        <div style="color: var(--text);">{{ profile()!.workExperience || profile()!.workExperience || 'Not specified' }}</div>
+      </div>
+      } @else {
+       <form (ngSubmit)="saveProfile()" #profileForm="ngForm">
+         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div style="grid-column: 1 / span 1;">
+              <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Name</label>
+              <input type="text" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="editName" [(ngModel)]="editName" required [disabled]="isLoading()">
+            </div>
+            <div style="grid-column: 2 / span 1;">
+              <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Phone</label>
+              <input type="text" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="editPhone" [(ngModel)]="editPhone" required [disabled]="isLoading()">
+            </div>
+            <div style="grid-column: 1 / span 1;">
+              <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Location</label>
+              <input type="text" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="editLocation" [(ngModel)]="editLocation" [disabled]="isLoading()">
+            </div>
+            <div style="grid-column: 2 / span 1;">
+              <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Address</label>
+              <input type="text" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="editAddress" [(ngModel)]="editAddress" [disabled]="isLoading()">
+            </div>
+            
+            <div style="grid-column: 1 / span 2; margin-top: 8px;">
+               <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px; color: var(--muted-2);">Expertise</label>
+               <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                 @for (exp of availableExpertise; track exp) {
+                   <div>
+                     <input style="display: none;" type="checkbox" [id]="'edit_exp_' + exp" [checked]="editExpertise.includes(exp)" (change)="toggleExpertise(exp)" [disabled]="isLoading()">
+                     <label [for]="'edit_exp_' + exp" style="display: inline-block; padding: 6px 12px; border: 1px solid var(--border); border-radius: 20px; font-size: 12px; cursor: pointer; user-select: none;" [style.background]="editExpertise.includes(exp) ? 'var(--primary)' : 'transparent'" [style.color]="editExpertise.includes(exp) ? '#fff' : 'var(--text)'" [style.borderColor]="editExpertise.includes(exp) ? 'var(--primary)' : 'var(--border)'">{{ exp }}</label>
+                   </div>
+                 }
+               </div>
+            </div>
+
+            <div style="grid-column: 1 / span 2; margin-top: 8px;">
+              <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Qualification</label>
+              <textarea style="width: 100%; min-height: 80px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="editQualification" [(ngModel)]="editQualification" [disabled]="isLoading()"></textarea>
+            </div>
+            <div style="grid-column: 1 / span 1;">
+              <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Work Experience (Years)</label>
+              <input type="number" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="editWorkExperience" [(ngModel)]="editWorkExperience" min="0" [disabled]="isLoading()">
+            </div>
+            <div style="grid-column: 2 / span 1;">
+              <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Hourly Rate (PKR)</label>
+              <input type="number" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="editHourlyRate" [(ngModel)]="editHourlyRate" min="0" step="1" [disabled]="isLoading()">
+            </div>
+            <div style="grid-column: 1 / span 2; display: flex; justify-content: flex-end; margin-top: 16px;">
+               <button type="submit" class="btn btn-primary" [disabled]="isLoading() || !profileForm.valid">
+                 Save Changes
+               </button>
+            </div>
+         </div>
+       </form>
+      }
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Security and Danger Zone -->
+  <div style="display: flex; flex-direction: column; gap: 24px;">
+    <!-- Password update -->
+    <div class="panel">
+       <div class="panel-head">
+         <h2>Security</h2>
+       </div>
+       <div style="padding: 24px;">
+       @if (pwSuccessMessage()) {
+         <div class="alert alert-success" style="padding: 12px; margin-bottom: 16px; border-radius: 6px; background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid rgba(16,185,129,0.2); font-size: 14px;">
+           <i class="bi bi-check-circle-fill me-2"></i> {{ pwSuccessMessage() }}
+         </div>
+       }
+       @if (pwErrorMessage()) {
+         <div class="alert alert-danger" style="padding: 12px; margin-bottom: 16px; border-radius: 6px; background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.2); font-size: 14px;">
+           <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ pwErrorMessage() }}
+         </div>
+       }
+       <form (ngSubmit)="changePassword()" #pwdForm="ngForm">
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+             <div>
+                <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Current Password</label>
+                <div style="position: relative;">
+                  <input [type]="showCurrentPassword ? 'text' : 'password'" style="width: 100%; padding: 8px 40px 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="currentPassword" [(ngModel)]="currentPassword" required [disabled]="isLoading()">
+                  <button type="button" (click)="showCurrentPassword = !showCurrentPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; padding: 0;">
+                    <i class="bi" [class.bi-eye]="!showCurrentPassword" [class.bi-eye-slash]="showCurrentPassword"></i>
+                  </button>
+                </div>
+             </div>
+             <div>
+                <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">New Password</label>
+                <div style="position: relative;">
+                  <input [type]="showNewPassword ? 'text' : 'password'" style="width: 100%; padding: 8px 40px 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="newPassword" [(ngModel)]="newPassword" required [disabled]="isLoading()">
+                  <button type="button" (click)="showNewPassword = !showNewPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; padding: 0;">
+                    <i class="bi" [class.bi-eye]="!showNewPassword" [class.bi-eye-slash]="showNewPassword"></i>
+                  </button>
+                </div>
+             </div>
+             <div>
+                <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Confirm Password</label>
+                <div style="position: relative;">
+                  <input [type]="showConfirmPassword ? 'text' : 'password'" style="width: 100%; padding: 8px 40px 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); color: var(--text);" name="confirmNewPassword" [(ngModel)]="confirmNewPassword" required [disabled]="isLoading()">
+                  <button type="button" (click)="showConfirmPassword = !showConfirmPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; padding: 0;">
+                    <i class="bi" [class.bi-eye]="!showConfirmPassword" [class.bi-eye-slash]="showConfirmPassword"></i>
+                  </button>
+                </div>
+             </div>
+             <div style="grid-column: 1 / span 3; display: flex; justify-content: flex-end; margin-top: 8px;">
+                <button type="submit" class="btn btn-primary" [disabled]="isLoading() || !pwdForm.valid">Update Password</button>
+             </div>
+          </div>
+       </form>
+       </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="panel" style="border: 1px solid var(--red);">
+       <div class="panel-head" style="border-bottom-color: rgba(239, 68, 68, 0.2);">
+         <h2 style="color: var(--red);">Danger Zone</h2>
+       </div>
+       <div style="padding: 24px;">
+         <p style="color: var(--muted); font-size: 13px; margin-bottom: 16px;">Deleting your account is permanent. If you have pending bookings, your request will be reviewed by an admin.</p>
+         <button class="btn btn-outline" style="border-color: var(--red); color: var(--red);" (click)="deleteAccount()">Request Account Deletion</button>
+       </div>
+    </div>
+  </div>
+</section>
+}

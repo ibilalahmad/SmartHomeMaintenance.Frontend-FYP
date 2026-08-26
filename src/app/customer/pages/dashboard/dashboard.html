@@ -1,0 +1,112 @@
+<div class="view-head">
+  <div>
+    <h2>Welcome, {{ customer()?.fullName || 'Customer' }}</h2>
+    <p class="text-muted">Here is an overview of your home maintenance activities.</p>
+  </div>
+  <div>
+    <a routerLink="/customer/search" class="btn btn-primary is-disabled"><i class="bi bi-search"></i> Book a Service</a>
+  </div>
+</div>
+
+<div class="is-disabled" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 24px;">
+  <div class="panel" style="padding: 24px; display: flex; align-items: center; gap: 16px;">
+    <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 24px;">
+      <i class="bi bi-calendar-check"></i>
+    </div>
+    <div>
+      <p style="color: var(--muted); margin: 0 0 4px; font-size: 14px;">Total Bookings</p>
+      <h3 style="margin: 0; font-size: 24px;">{{ stats().totalBookings }}</h3>
+    </div>
+  </div>
+
+  <div class="panel" style="padding: 24px; display: flex; align-items: center; gap: 16px;">
+    <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(34, 197, 94, 0.1); color: var(--green); display: flex; align-items: center; justify-content: center; font-size: 24px;">
+      <i class="bi bi-cash-stack"></i>
+    </div>
+    <div>
+      <p style="color: var(--muted); margin: 0 0 4px; font-size: 14px;">Total Spent</p>
+      <h3 style="margin: 0; font-size: 24px;">Rs. {{ stats().totalSpent | number }}</h3>
+    </div>
+  </div>
+
+  <div class="panel" style="padding: 24px; display: flex; align-items: center; gap: 16px;">
+    <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); color: var(--red); display: flex; align-items: center; justify-content: center; font-size: 24px;">
+      <i class="bi bi-exclamation-octagon"></i>
+    </div>
+    <div>
+      <p style="color: var(--muted); margin: 0 0 4px; font-size: 14px;">Active Complaints</p>
+      <h3 style="margin: 0; font-size: 24px;">{{ stats().activeComplaints }}</h3>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2 is-disabled">
+  <div class="panel">
+    <div class="panel-head">
+      <h3 style="margin: 0; font-size: 16px;">Upcoming Bookings</h3>
+    </div>
+    
+    @if (upcomingBookings().length > 0) {
+      <div style="display: flex; flex-direction: column;">
+        @for (b of upcomingBookings(); track b.id) {
+          <div style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; gap: 16px; align-items: center;">
+               <div style="width: 48px; height: 48px; border-radius: 8px; background: var(--bg-1); display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                 <i class="bi bi-tools" style="font-size: 20px;"></i>
+               </div>
+               <div>
+                 <h4 style="margin: 0 0 4px; font-size: 15px;">{{ b.service }}</h4>
+                 <div style="font-size: 13px; color: var(--muted-2);">{{ b.provider }} &bull; {{ b.when | date:'medium' }}</div>
+               </div>
+            </div>
+            <a [routerLink]="['/customer/bookings', b.id]" class="btn btn-outline btn-sm">Details</a>
+          </div>
+        }
+      </div>
+      <div style="padding: 12px; text-align: center;">
+        <a routerLink="/customer/bookings" class="link-quiet" style="font-size: 13px; font-weight: 500;">View All Bookings <i class="bi bi-arrow-right"></i></a>
+      </div>
+    } @else {
+      <div style="padding: 40px; text-align: center; color: var(--muted);">
+        <i class="bi bi-calendar-x" style="font-size: 32px; display: block; margin-bottom: 12px; color: var(--muted-2);"></i>
+        <p>No upcoming bookings.</p>
+        <a routerLink="/customer/search" class="btn btn-primary mt-2">Book a Service</a>
+      </div>
+    }
+  </div>
+
+  <div class="panel">
+    <div class="panel-head" style="display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="margin: 0; font-size: 16px;">Favorite Providers</h3>
+      <a routerLink="/customer/favorites" class="link-quiet" style="font-size: 13px;">See All</a>
+    </div>
+    
+    @if (favoriteProviders().length > 0) {
+      <div style="display: flex; flex-direction: column;">
+        @for (prov of favoriteProviders(); track prov.providerId) {
+          <div style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; gap: 16px; align-items: center;">
+               <div style="width: 48px; height: 48px; border-radius: 50%; overflow: hidden; border: 2px solid var(--border);">
+                 @if (prov.profilePic) {
+                   <img [src]="prov.profilePic" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                 } @else {
+                   <i class="bi bi-person-fill" style="font-size: 2.5rem; color: var(--secondary); display: flex; align-items: center; justify-content: center; height: 100%; background: var(--border);"></i>
+                 }
+               </div>
+               <div>
+                 <h4 style="margin: 0 0 4px; font-size: 15px;">{{ prov.fullName }}</h4>
+                 <div style="font-size: 13px; color: var(--muted-2);">{{ prov.expertise }}</div>
+               </div>
+            </div>
+            <a [routerLink]="['/customer/provider', prov.providerId]" class="btn btn-outline-primary btn-sm">Profile</a>
+          </div>
+        }
+      </div>
+    } @else {
+      <div style="padding: 40px; text-align: center; color: var(--muted);">
+        <i class="bi bi-heart" style="font-size: 32px; display: block; margin-bottom: 12px; color: var(--muted-2);"></i>
+        <p>You haven't saved any providers yet.</p>
+      </div>
+    }
+  </div>
+</div>

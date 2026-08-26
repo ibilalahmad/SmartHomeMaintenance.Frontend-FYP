@@ -1,0 +1,76 @@
+<!-- Settings View -->
+<div class="view-head">
+  <div>
+    <h1>Settings</h1>
+    <p>Manage your admin profile and account security.</p>
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- Profile Settings Panel -->
+  <div class="panel d-flex flex-column gap-4">
+    <div class="panel-head mb-0">
+      <h2 class="m-0">Profile Info</h2>
+    </div>
+
+    <!-- Profile Picture Section -->
+    <div class="d-flex align-items-center gap-4 pb-4 border-bottom">
+      <div style="width: 80px; height: 80px; border-radius: 50%; overflow: hidden; background: var(--border);">
+        @if (profilePic) {
+          <img [src]="profilePic" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
+        } @else {
+          <i class="bi bi-person-fill" style="font-size: 4rem; color: var(--secondary); display: flex; align-items: center; justify-content: center; height: 100%;"></i>
+        }
+      </div>
+      <div>
+        <h3 style="font-size: 16px; margin: 0 0 8px 0;">Profile Picture</h3>
+        <p class="text-muted small m-0 mb-3">PNG, JPG or GIF under 2MB</p>
+        <div class="d-flex gap-2">
+          <input type="file" id="profilePicInput" style="display: none;" accept="image/*" (change)="onFileSelected($event)">
+          <button type="button" class="btn btn-outline-primary btn-sm" (click)="triggerFileInput()">
+            <i class="bi bi-upload"></i> Upload New
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Basic Info Form -->
+    <div class="d-flex flex-column gap-3">
+      <div>
+        <label for="settingsFullName" class="form-label">Full Name</label>
+        <input id="settingsFullName" type="text" class="form-control" [(ngModel)]="fullName" placeholder="Full name">
+      </div>
+      <div>
+        <label for="settingsEmail" class="form-label">Email Address</label>
+        <input id="settingsEmail" type="email" class="form-control" [(ngModel)]="email" placeholder="Email address">
+      </div>
+      <div class="d-flex justify-content-end mt-2">
+        <button class="btn btn-primary" (click)="saveChanges()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Security Settings Panel -->
+  <div class="panel d-flex flex-column gap-4">
+    <div class="panel-head mb-0">
+      <h2 class="m-0">Change Password</h2>
+    </div>
+    
+    <div class="d-flex flex-column gap-3">
+      <p class="text-muted small m-0">Ensure your account is using a long, random password to stay secure.</p>
+      
+      <div>
+        <label for="settingsPassword" class="form-label">Current Password</label>
+        <input id="settingsPassword" type="password" class="form-control" [(ngModel)]="password" placeholder="Current password">
+      </div>
+      <div>
+        <label for="settingsNewPassword" class="form-label">New Password</label>
+        <input id="settingsNewPassword" type="password" class="form-control" [(ngModel)]="newPassword" placeholder="New password">
+        <div class="form-text">Must be at least 8 characters long.</div>
+      </div>
+      <div class="d-flex justify-content-end mt-2">
+        <button class="btn btn-primary" (click)="changePassword()">Update Password</button>
+      </div>
+    </div>
+  </div>
+</div>

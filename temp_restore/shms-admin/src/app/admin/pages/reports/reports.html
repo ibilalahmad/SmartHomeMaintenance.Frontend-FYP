@@ -1,0 +1,58 @@
+<!-- Reports & Analytics View -->
+<div class="view-head">
+  <div>
+    <h1>Reports &amp; Analytics</h1>
+    <p>Monthly performance across bookings, providers, and customers.</p>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-outline"><i class="bi bi-filetype-pdf"></i> Export PDF</button>
+    <button class="btn btn-outline"><i class="bi bi-filetype-xlsx"></i> Export Excel</button>
+  </div>
+</div>
+
+<!-- Summary Stat Cards -->
+<section class="stat-grid">
+  <app-stat-card
+    icon="bi-calendar2-check"
+    iconClass="stat-icon--blue"
+    label="Bookings This Month"
+    value="341">
+  </app-stat-card>
+  <app-stat-card
+    icon="bi-check2-circle"
+    iconClass="stat-icon--teal"
+    label="Completed"
+    value="298">
+  </app-stat-card>
+  <app-stat-card
+    icon="bi-x-circle"
+    iconClass="stat-icon--red"
+    label="Cancelled"
+    value="27">
+  </app-stat-card>
+  <app-stat-card
+    icon="bi-star"
+    iconClass="stat-icon--amber"
+    label="Avg. Platform Rating"
+    value="4.6">
+  </app-stat-card>
+</section>
+
+<!-- Top Rated Providers -->
+<section class="panel">
+  <div class="panel-head"><h2>Top Rated Providers</h2></div>
+  <ul class="rating-list">
+    @for (r of topProviders(); track r.name) {
+      <li class="rating-item">
+        <app-avatar-initials [name]="r.name"></app-avatar-initials>
+        <div class="rating-info">
+          <strong>{{ r.name }}</strong>
+          <span class="rating-pill" style="color:var(--muted)">
+            <app-star-rating [rating]="r.rating"></app-star-rating>
+            <span style="color:var(--text); margin-left:4px">{{ r.rating }}</span>
+          </span>
+        </div>
+      </li>
+    }
+  </ul>
+</section>

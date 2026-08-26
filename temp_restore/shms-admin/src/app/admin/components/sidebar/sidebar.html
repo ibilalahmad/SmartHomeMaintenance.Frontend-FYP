@@ -1,0 +1,42 @@
+<!-- Brand -->
+<div class="brand">
+  <span class="brand-mark"><i class="bi bi-tools"></i></span>
+  <div class="brand-text">
+    <strong>ServiFix</strong>
+    <small>Admin Panel</small>
+  </div>
+</div>
+
+<!-- Navigation -->
+<nav class="nav-menu">
+  @for (group of navGroups; track group.groupLabel) {
+    <p class="nav-label">{{ group.groupLabel }}</p>
+
+    @for (item of group.items; track item.route) {
+      <a
+        class="nav-item"
+        [routerLink]="item.route"
+        routerLinkActive="is-active"
+        (click)="onNavClick()"
+      >
+        <i class="bi {{ item.icon }}"></i>
+        <span>{{ item.label }}</span>
+        @if (item.badge) {
+          <span class="nav-badge" [class.nav-badge--danger]="item.badgeDanger">
+            {{ item.badge }}
+          </span>
+        }
+      </a>
+    }
+  }
+</nav>
+
+<!-- Footer links -->
+<div class="sidebar-foot">
+  <a class="nav-item" routerLink="/admin/settings" routerLinkActive="is-active" (click)="onNavClick()">
+    <i class="bi bi-gear"></i><span>Settings</span>
+  </a>
+  <button class="nav-item" (click)="onLogout()">
+    <i class="bi bi-box-arrow-left"></i><span>Log Out</span>
+  </button>
+</div>

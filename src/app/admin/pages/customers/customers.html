@@ -1,0 +1,175 @@
+<!-- Customers View -->
+<div class="view-head">
+  <div>
+    <h1>Customers</h1>
+    <p>View booking history, complaints, and account status.</p>
+  </div>
+  <button class="btn btn-primary" (click)="openAddModal()">
+    <i class="bi bi-plus-lg"></i> Add Customer
+  </button>
+</div>
+
+<ng-template #customerModal>
+  <form (ngSubmit)="submitCustomer()" #addForm="ngForm" class="d-flex flex-column gap-3">
+    <div class="row g-3">
+      <div class="col-md-12">
+        <label class="form-label">Customer Name</label>
+        <input type="text" class="form-control" name="name" [(ngModel)]="newCustomer.fullName" required>
+      </div>
+      <div class="col-md-12">
+        <label class="form-label">Profile Picture</label>
+        <div class="d-flex align-items-center gap-3">
+          @if (newCustomer.profilePic) {
+            <img [src]="newCustomer.profilePic" alt="Preview" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border);">
+          } @else {
+            <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--bg); display: flex; align-items: center; justify-content: center; color: var(--muted-2); border: 1px solid var(--border);">
+              <i class="bi bi-person-fill" style="font-size: 24px;"></i>
+            </div>
+          }
+          <div>
+             <input type="file" class="form-control form-control-sm" accept="image/*" (change)="onProfilePictureSelected($event)">
+             <div class="form-text">Select an image to upload</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" name="email" [(ngModel)]="newCustomer.email">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Phone</label>
+        <input type="text" class="form-control" name="phone" [(ngModel)]="newCustomer.phoneNumber">
+      </div>
+      @if (!isEditing) {
+      <div class="col-md-6">
+        <label class="form-label">Password *</label>
+        <input type="password" class="form-control" name="password" [(ngModel)]="newCustomerPassword" [required]="!isEditing">
+      </div>
+      }
+      <div class="col-md-6">
+        <label class="form-label">Address</label>
+        <input type="text" class="form-control" name="address" [(ngModel)]="newCustomer.address">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Location (Default Address)</label>
+        <input type="text" class="form-control" name="location" [(ngModel)]="newCustomer.defaultAddress">
+      </div>
+      <div class="col-md-12">
+        <label class="form-label">Status</label>
+        <select class="form-select" name="status" [(ngModel)]="newCustomer.status">
+          <option value="Active">Active</option>
+          <option value="Blocked">Blocked</option>
+        </select>
+      </div>
+    </div>
+    <div class="d-flex justify-content-end gap-2 mt-2">
+      <button type="button" class="btn btn-light" (click)="closeModal()">Cancel</button>
+      <button type="submit" class="btn btn-primary" [disabled]="!addForm.valid">Save Customer</button>
+    </div>
+  </form>
+</ng-template>
+
+
+<div class="toolbar">
+  <div class="search-field search-field--panel">
+    <i class="bi bi-search"></i>
+    <input
+      type="text"
+      placeholder="Search customers…"
+      (input)="onSearch($any($event.target).value)"
+      id="customerSearch">
+  </div>
+</div>
+
+<!-- Table -->
+<div class="panel">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex align-items-center gap-2">
+      <span class="text-muted small">Show</span>
+      <select class="form-select form-select-sm w-auto" [ngModel]="pageSize()" (ngModelChange)="changePageSize($event)">
+        @for (size of pageSizes; track size) {
+          <option [value]="size">{{ size }}</option>
+        }
+      </select>
+      <span class="text-muted small">entries</span>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width: 60px;">#</th>
+          <th>Customer Info</th>
+          <th>Location</th>
+          <th>Bookings</th>
+          <th>Complaints Filed</th>
+          <th>Joined</th>
+          <th>Status</th>
+          <th>Manage</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of paginatedCustomers(); track c.customerId; let i = $index) {
+          <tr>
+            <td class="text-muted">{{ (currentPage() - 1) * pageSize() + i + 1 }}</td>
+            <td>
+              <div class="cell-person">
+                @if (c.profilePic) {
+                  <img [src]="c.profilePic" alt="Avatar" style="width: 32px; height: 32px; border-radius: 9px; object-fit: cover;">
+                } @else {
+                  <app-avatar-initials [name]="c.fullName"></app-avatar-initials>
+                }
+                <div>
+                  <div class="cell-title">{{ c.fullName }}</div>
+                  <div class="cell-sub">{{ c.email }} | {{ c.phoneNumber }}</div>
+                </div>
+              </div>
+            </td>
+            <td>{{ c.defaultAddress }}</td>
+            <td>{{ c.bookings }}</td>
+            <td>{{ c.complaints }}</td>
+            <td>{{ c.regDate | date:'medium' }}</td>
+            <td><app-status-badge [status]="c.status || 'Active'"></app-status-badge></td>
+            <td>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-secondary" (click)="toggleBlock(c)" [title]="c.status === 'Blocked' ? 'Unblock Customer' : 'Block Customer'">
+                  @if (c.status === 'Blocked') {
+                    <i class="bi bi-unlock"></i> Unblock
+                  } @else {
+                    <i class="bi bi-lock"></i> Block
+                  }
+                </button>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex gap-2">
+                <button class="icon-action text-primary" (click)="openEditModal(c)" title="Edit Customer"><i class="bi bi-pencil"></i></button>
+                <a class="icon-action text-info" [routerLink]="['/admin/customers', c.customerId]" title="View Details"><i class="bi bi-eye"></i></a>
+                <button class="icon-action text-danger" (click)="deleteCustomer(c.customerId)" title="Delete Customer"><i class="bi bi-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (totalPages() > 1) {
+    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+      <div class="text-muted small">
+        Showing {{ (currentPage() - 1) * pageSize() + 1 }} to {{ Math.min(currentPage() * pageSize(), customers().length) }} of {{ customers().length }} entries
+      </div>
+      <div class="d-flex gap-1">
+        <button class="btn btn-sm btn-outline-secondary" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">Previous</button>
+        @for (page of pageNumbers(); track page) {
+          <button class="btn btn-sm" [class.btn-primary]="currentPage() === page" [class.btn-outline-secondary]="currentPage() !== page" (click)="goToPage(page)">
+            {{ page }}
+          </button>
+        }
+        <button class="btn btn-sm btn-outline-secondary" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">Next</button>
+      </div>
+    </div>
+  }
+</div>

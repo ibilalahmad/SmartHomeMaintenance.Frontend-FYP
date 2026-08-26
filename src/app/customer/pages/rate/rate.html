@@ -1,0 +1,79 @@
+<div class="view-head">
+  <div>
+    <h2>Rate & Review</h2>
+    <p class="text-muted">Share your experience with our service providers.</p>
+  </div>
+</div>
+
+<div class="panel" style="max-width: 600px; margin: 0 auto; padding: 32px;">
+  @if (isLoading()) {
+    <div style="text-align: center; padding: 40px; color: var(--muted);">
+      <span class="spinner-border text-primary"></span>
+    </div>
+  } @else if (completedBookings().length === 0) {
+    <div style="text-align: center; color: var(--muted-2);">
+      <i class="bi bi-star" style="font-size: 40px; margin-bottom: 16px; display: block;"></i>
+      <p>You don't have any completed bookings to rate yet.</p>
+    </div>
+  } @else {
+    
+    @if (errorMessage()) {
+    <div style="padding: 12px; background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--red); color: var(--red); margin-bottom: 24px; border-radius: 4px; display: flex; align-items: center; gap: 8px;">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <div>{{ errorMessage() }}</div>
+    </div>
+    }
+    
+    @if (successMessage()) {
+    <div style="padding: 16px; background: rgba(34, 197, 94, 0.1); color: var(--green); border-radius: 8px; text-align: center; font-weight: 500;">
+      <i class="bi bi-check-circle-fill" style="font-size: 24px; display: block; margin-bottom: 12px;"></i>
+      {{ successMessage() }}
+    </div>
+    } @else {
+      <form (ngSubmit)="onSubmit()" #rateForm="ngForm">
+        
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Select Completed Service *</label>
+          <select class="form-control" style="width: 100%; padding: 10px;" name="booking" [(ngModel)]="selectedBookingId" required>
+            <option value="" disabled selected>Select a booking</option>
+            @for (b of completedBookings(); track b.id) {
+              <option [value]="b.id">{{ b.service }} by {{ b.provider }} ({{ b.when | date:'shortDate' }})</option>
+            }
+          </select>
+        </div>
+
+        <div style="margin-bottom: 24px; text-align: center;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 12px; color: var(--muted-2);">Your Rating *</label>
+          <div style="font-size: 32px; color: var(--muted); display: flex; gap: 8px; justify-content: center; cursor: pointer;">
+             <i class="bi" [class.bi-star]="rating < 1" [class.bi-star-fill]="rating >= 1" [style.color]="rating >= 1 ? 'var(--warning)' : ''" (click)="setRating(1)"></i>
+             <i class="bi" [class.bi-star]="rating < 2" [class.bi-star-fill]="rating >= 2" [style.color]="rating >= 2 ? 'var(--warning)' : ''" (click)="setRating(2)"></i>
+             <i class="bi" [class.bi-star]="rating < 3" [class.bi-star-fill]="rating >= 3" [style.color]="rating >= 3 ? 'var(--warning)' : ''" (click)="setRating(3)"></i>
+             <i class="bi" [class.bi-star]="rating < 4" [class.bi-star-fill]="rating >= 4" [style.color]="rating >= 4 ? 'var(--warning)' : ''" (click)="setRating(4)"></i>
+             <i class="bi" [class.bi-star]="rating < 5" [class.bi-star-fill]="rating >= 5" [style.color]="rating >= 5 ? 'var(--warning)' : ''" (click)="setRating(5)"></i>
+          </div>
+          <div style="font-size: 13px; color: var(--muted-2); margin-top: 8px;">
+             @if (rating === 1) { <span>Poor</span> }
+             @if (rating === 2) { <span>Fair</span> }
+             @if (rating === 3) { <span>Average</span> }
+             @if (rating === 4) { <span>Good</span> }
+             @if (rating === 5) { <span>Excellent</span> }
+          </div>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted-2);">Remarks (Optional)</label>
+          <textarea class="form-control" style="width: 100%; padding: 10px;" rows="4" name="remarks" [(ngModel)]="remarks" placeholder="Tell us about your experience..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 16px;" [disabled]="isSubmitting() || !selectedBookingId || rating === 0">
+          @if (isSubmitting()) {
+            <span class="spinner-border spinner-border-sm me-2"></span> Submitting...
+          } @else {
+            Submit Review
+          }
+        </button>
+
+      </form>
+    }
+  }
+</div>

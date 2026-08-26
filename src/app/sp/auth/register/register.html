@@ -1,0 +1,114 @@
+<div class="register-wrapper">
+  <div class="register-container">
+    <div class="text-center mb-4">
+      <img src="/assets/logo.png" alt="App Logo" style="max-height: 50px;">
+      <h2 class="mt-3">Service Provider Registration</h2>
+      <p class="text-muted">Join the SHMS network and start receiving jobs.</p>
+    </div>
+
+    @if (errorMessage()) {
+    <div class="alert alert-danger d-flex align-items-center gap-2">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <div>{{ errorMessage() }}</div>
+    </div>
+    }
+
+    @if (successMessage()) {
+    <div class="alert alert-success d-flex align-items-center gap-2">
+      <i class="bi bi-check-circle-fill"></i>
+      <div>{{ successMessage() }}</div>
+    </div>
+    } @else {
+    <form (ngSubmit)="onSubmit()" #regForm="ngForm">
+      <div class="row g-3">
+        <!-- Personal Info -->
+        <div class="col-md-6">
+          <label class="form-label">Full Name *</label>
+          <input type="text" class="form-control" name="name" [(ngModel)]="name" required [disabled]="isLoading()">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Email Address *</label>
+          <input type="email" class="form-control" name="email" [(ngModel)]="email" required [disabled]="isLoading()">
+        </div>
+        
+        <div class="col-md-6">
+          <label for="spPassword">Password</label>
+          <div style="position: relative;">
+            <input id="spPassword" [type]="showPassword ? 'text' : 'password'" class="form-control" name="password" [(ngModel)]="password" required placeholder="Create a secure password" [disabled]="isLoading()">
+            <button type="button" (click)="showPassword = !showPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; padding: 0;">
+              <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+            </button>
+          </div>
+          <small class="text-muted">Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char.</small>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Confirm Password *</label>
+          <div style="position: relative;">
+            <input [type]="showConfirmPassword ? 'text' : 'password'" class="form-control" name="confirmPassword" [(ngModel)]="confirmPassword" required [disabled]="isLoading()">
+            <button type="button" (click)="showConfirmPassword = !showConfirmPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; padding: 0;">
+              <i class="bi" [class.bi-eye]="!showConfirmPassword" [class.bi-eye-slash]="showConfirmPassword"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Phone Number *</label>
+          <input type="tel" class="form-control" name="phone" [(ngModel)]="phone" required [disabled]="isLoading()">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Address *</label>
+          <input type="text" class="form-control" name="address" [(ngModel)]="address" required [disabled]="isLoading()">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Location (City/Area) *</label>
+          <input type="text" class="form-control" name="location" [(ngModel)]="location" required [disabled]="isLoading()">
+        </div>
+
+
+
+        <div class="col-12 mt-4">
+          <label class="form-label fw-bold">Expertise *</label>
+          <div class="d-flex flex-wrap gap-2">
+            @for (exp of availableExpertise; track exp) {
+              <div class="form-check custom-checkbox-badge">
+                <input class="btn-check" type="checkbox" [id]="'exp_' + exp" [checked]="expertise.includes(exp)" (change)="toggleExpertise(exp)" [disabled]="isLoading()">
+                <label class="btn btn-outline-primary btn-sm" [for]="'exp_' + exp">{{ exp }}</label>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="col-12 mt-4">
+          <label class="form-label">Qualification</label>
+          <textarea class="form-control" rows="2" name="qualification" [(ngModel)]="qualification" placeholder="e.g. Certified Plumber from XYZ Institute" [disabled]="isLoading()"></textarea>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Work Experience (Years) *</label>
+          <input type="number" class="form-control" name="workExperience" [(ngModel)]="workExperience" min="0" required [disabled]="isLoading()">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Hourly Rate (PKR) *</label>
+          <input type="number" class="form-control" name="hourlyRate" [(ngModel)]="hourlyRate" min="0" step="1" required [disabled]="isLoading()">
+        </div>
+
+        <div class="col-12 mt-4">
+          <button type="submit" class="btn btn-primary w-100" [disabled]="isLoading() || !regForm.valid">
+            @if (isLoading()) {
+              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              Submitting...
+            } @else {
+              Register
+            }
+          </button>
+        </div>
+      </div>
+
+      <div class="text-center mt-4" style="font-size: 0.95rem;">
+        <p>Already have an account? <a routerLink="/login" style="color: var(--primary); text-decoration: none; font-weight: 600;">Sign in here</a></p>
+      </div>
+    </form>
+    }
+  </div>
+</div>

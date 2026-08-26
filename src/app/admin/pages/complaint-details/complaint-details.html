@@ -1,0 +1,123 @@
+<div class="view-head">
+  <div>
+    <h1>Complaint Details</h1>
+    <p>Review the incident, update the status, and take necessary administrative actions.</p>
+  </div>
+  <a routerLink="/admin/complaints" class="btn btn-outline">
+    <i class="bi bi-arrow-left"></i> Back to Complaints
+  </a>
+</div>
+
+@if (complaint()) {
+  <div class="grid-2" style="align-items: start;">
+    
+    <!-- Left Column: Details -->
+    <div class="d-flex flex-column gap-3">
+      <div class="panel">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="m-0">Complaint #{{ complaint()?.id }}</h2>
+          <app-status-badge [status]="complaint()?.status || 'Pending'"></app-status-badge>
+        </div>
+        
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="text-muted small mb-1">Customer</div>
+            <div class="fw-medium">{{ complaint()?.customer }}</div>
+          </div>
+          <div class="col-md-6">
+            <div class="text-muted small mb-1">Provider</div>
+            <div class="fw-medium">{{ complaint()?.provider }}</div>
+          </div>
+          <div class="col-md-6">
+            <div class="text-muted small mb-1">Filed On</div>
+            <div>{{ complaint()?.filed }}</div>
+          </div>
+          <div class="col-md-6">
+            <div class="text-muted small mb-1">Related Booking</div>
+            <div>
+              @if (complaint()?.bookingId) {
+                <a routerLink="/admin/bookings" class="text-primary">{{ complaint()?.bookingId }}</a>
+              } @else {
+                <span class="text-muted">N/A</span>
+              }
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="text-muted small mb-1">Reason / Description</div>
+            <div class="p-3 bg-light rounded" style="border: 1px solid var(--border);">
+              {{ complaint()?.reason }}
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="text-muted small mb-1">Evidence Provided</div>
+            <div>
+              @if (complaint()?.evidenceLink) {
+                <a href="{{ complaint()?.evidenceLink }}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-box-arrow-up-right"></i> View Evidence Link</a>
+              } @else {
+                <span class="text-muted"><i class="bi bi-info-circle"></i> No evidence provided</span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Panel for Provider -->
+      <div class="panel border-danger border" style="border-width: 2px !important;">
+        <div class="panel-head">
+          <h2 class="text-danger m-0"><i class="bi bi-exclamation-octagon"></i> Administrative Actions</h2>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fw-medium">Warnings Issued: <span class="badge bg-warning text-dark ms-2">{{ complaint()?.warningsIssued || 0 }}</span></div>
+            <div class="text-muted small mt-1">Actions taken here immediately affect the provider.</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-warning" (click)="sendWarning()"><i class="bi bi-exclamation-triangle"></i> Issue Warning</button>
+            <button type="button" class="btn btn-danger" (click)="blockProvider()"><i class="bi bi-slash-circle"></i> Block SP</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Resolution & Updates -->
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Resolution &amp; Updates</h2>
+      </div>
+      <form (ngSubmit)="updateComplaint()" class="d-flex flex-column gap-3">
+        
+        <div>
+          <label class="form-label">Current Status</label>
+          <select class="form-select" name="status" [ngModel]="complaint()?.status" (ngModelChange)="complaint() && (complaint()!.status = $event)">
+            @for (status of statuses; track status) {
+              <option [value]="status">{{ status }}</option>
+            }
+          </select>
+        </div>
+
+        @if (complaint()?.status === 'Dismissed') {
+          <div class="p-3 bg-light rounded border border-danger">
+            <label class="form-label text-danger">Reason for Dismissal <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="dismissReason" [ngModel]="complaint()?.dismissReason" (ngModelChange)="complaint() && (complaint()!.dismissReason = $event)" placeholder="Required (visible to customer)" required>
+            <div class="form-text">Customer will be notified of this reason.</div>
+          </div>
+        }
+
+        <div>
+          <label class="form-label">Internal Admin Notes</label>
+          <textarea class="form-control" name="notes" [ngModel]="complaint()?.notes" (ngModelChange)="complaint() && (complaint()!.notes = $event)" rows="3" placeholder="Private notes for admins only..."></textarea>
+        </div>
+
+        <div>
+          <label class="form-label">Resolution Message (Visible to Customer &amp; SP)</label>
+          <textarea class="form-control" name="resolutionMessage" [ngModel]="complaint()?.resolutionMessage" (ngModelChange)="complaint() && (complaint()!.resolutionMessage = $event)" rows="4" placeholder="Draft a final response..."></textarea>
+        </div>
+
+        <div class="d-flex justify-content-end mt-2 pt-3 border-top">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+}

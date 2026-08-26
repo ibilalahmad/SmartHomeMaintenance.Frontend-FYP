@@ -1,0 +1,85 @@
+<!-- Reviews View -->
+<div class="view-head">
+  <div>
+    <h1>Ratings &amp; Reviews</h1>
+    <p>Monitor customer feedback across all service providers.</p>
+  </div>
+</div>
+
+<section class="grid-2">
+  <!-- Average Rating by Provider -->
+  <div class="panel">
+    <div class="panel-head"><h2>Average Rating by Provider</h2></div>
+    <ul class="rating-list">
+      @for (r of ratings(); track r.name) {
+        <li class="rating-item">
+          <app-avatar-initials [name]="r.name"></app-avatar-initials>
+          <div class="rating-info">
+            <strong>{{ r.name }}</strong>
+            <span class="rating-pill" style="color:var(--muted)">
+              <app-star-rating [rating]="r.rating"></app-star-rating>
+              <span style="color:var(--text); margin-left:4px">{{ r.rating }}</span>
+              <span class="cell-sub">({{ r.count }})</span>
+            </span>
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+
+  <!-- Recent Remarks -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Recent Remarks</h2>
+      <select class="form-select form-select-sm w-auto" [ngModel]="activeFilter()" (ngModelChange)="setFilter($event)">
+        <option value="All">All Ratings</option>
+        <option value="5 Stars">5 Stars</option>
+        <option value="1-4 Stars">1-4 Stars</option>
+        <option value="Hidden">Hidden Only</option>
+        <option value="Audit Log (Removed)">Audit Log (Removed)</option>
+      </select>
+    </div>
+    <ul class="review-list">
+      @for (r of reviews(); track r.customer) {
+        <li style="display: flex; flex-direction: column; gap: 8px; padding-bottom: 16px; border-bottom: 1px solid var(--border); margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="display: flex; flex-direction: column;">
+              <div class="cell-title">{{ r.customer }} &rarr; {{ r.provider }}</div>
+              <div class="rating-pill" style="margin-top: 4px; padding-left: 0;">
+                <app-star-rating [rating]="r.stars"></app-star-rating>
+                <span style="font-weight: normal; margin-left: 6px; color: var(--muted);" class="cell-sub">{{ r.date | date:'medium' }}</span>
+              </div>
+            </div>
+            
+            <div class="d-flex gap-2">
+              @if (r.status !== 'Removed') {
+                <button class="btn btn-sm btn-outline-secondary" (click)="toggleReviewStatus(r)" [title]="r.status === 'Published' ? 'Hide Review' : 'Publish Review'">
+                  @if (r.status === 'Published') {
+                    <i class="bi bi-eye-slash"></i> Hide
+                  } @else {
+                    <i class="bi bi-eye"></i> Publish
+                  }
+                </button>
+                <button class="icon-action text-danger" (click)="deleteReview(r)" title="Remove Review">
+                  <i class="bi bi-trash"></i>
+                </button>
+              } @else {
+                <span class="badge badge--red"><i class="bi bi-exclamation-triangle"></i> Removed</span>
+              }
+            </div>
+          </div>
+          
+          <p style="font-size: 14px; margin: 0; line-height: 1.5;"
+             [style.color]="r.status === 'Removed' ? 'var(--red)' : 'inherit'"
+             [style.text-decoration]="r.status === 'Removed' ? 'line-through' : 'none'"
+             [style.opacity]="r.status === 'Hidden' ? '0.5' : '1'">
+            {{ r.text }}
+          </p>
+          @if (r.status === 'Removed' && r.removedAt) {
+            <div class="cell-sub" style="color: var(--red); font-size: 12px; margin-top: 4px;">Removed on: {{ r.removedAt }}</div>
+          }
+        </li>
+      }
+    </ul>
+  </div>
+</section>

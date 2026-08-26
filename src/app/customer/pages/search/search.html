@@ -1,0 +1,112 @@
+<div class="view-head">
+  <div>
+    <h2>Search Providers</h2>
+    <p class="text-muted">Find the best home maintenance professionals near you.</p>
+  </div>
+</div>
+
+<div class="search-layout">
+  <!-- Filters Sidebar -->
+  <aside class="search-filters panel">
+    <h3 style="margin-bottom: 16px; font-size: 16px;">Filters</h3>
+    
+    <div style="margin-bottom: 16px;">
+      <label style="display: block; font-size: 13px; color: var(--muted-2); margin-bottom: 6px;">Keyword Search</label>
+      <div class="search-box" style="width: 100%;">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="Name or skill..." [(ngModel)]="filters.keyword" (ngModelChange)="applyFilters()">
+      </div>
+    </div>
+
+    <div style="margin-bottom: 16px;">
+      <label style="display: block; font-size: 13px; color: var(--muted-2); margin-bottom: 6px;">Location</label>
+      <select class="form-control" style="width: 100%; padding: 8px;" [(ngModel)]="filters.location" (ngModelChange)="applyFilters()">
+        <option value="">All Locations</option>
+        @for (loc of locations; track loc) {
+          <option [value]="loc">{{ loc }}</option>
+        }
+      </select>
+    </div>
+
+    <div style="margin-bottom: 16px;">
+      <label style="display: block; font-size: 13px; color: var(--muted-2); margin-bottom: 6px;">Expertise</label>
+      <select class="form-control" style="width: 100%; padding: 8px;" [(ngModel)]="filters.expertise" (ngModelChange)="applyFilters()">
+        <option value="">All Services</option>
+        @for (exp of expertises; track exp) {
+          <option [value]="exp">{{ exp }}</option>
+        }
+      </select>
+    </div>
+
+    <div style="margin-bottom: 16px;">
+      <label style="display: block; font-size: 13px; color: var(--muted-2); margin-bottom: 6px;">Minimum Rating</label>
+      <select class="form-control" style="width: 100%; padding: 8px;" [(ngModel)]="filters.minRating" (ngModelChange)="applyFilters()">
+        <option [value]="0">Any Rating</option>
+        <option [value]="4.5">4.5 & up (Excellent)</option>
+        <option [value]="4.0">4.0 & up (Good)</option>
+        <option [value]="3.0">3.0 & up (Average)</option>
+      </select>
+    </div>
+
+    <button class="btn btn-outline" style="width: 100%;" (click)="clearFilters()">Clear Filters</button>
+  </aside>
+
+  <!-- Results Area -->
+  <div class="search-results">
+    @if (isLoading()) {
+      <div style="text-align: center; padding: 40px; color: var(--muted);">
+        <span class="spinner-border text-primary" role="status"></span>
+        <p style="margin-top: 16px;">Searching for providers...</p>
+      </div>
+    } @else if (providers().length === 0) {
+      <div class="panel" style="text-align: center; padding: 40px;">
+        <i class="bi bi-search" style="font-size: 40px; color: var(--muted-2); margin-bottom: 16px; display: block;"></i>
+        <h4>No Providers Found</h4>
+        <p class="text-muted">We couldn't find anyone matching your current filters.</p>
+        <button class="btn btn-primary mt-3" (click)="clearFilters()">Clear Filters</button>
+      </div>
+    } @else {
+      <div style="margin-bottom: 16px; font-weight: 500; color: var(--muted-2);">
+        Showing {{ providers().length }} provider(s)
+      </div>
+      
+      <div class="provider-grid">
+        @for (provider of providers(); track provider.providerId.toString()) {
+          <div class="panel provider-card">
+            <button class="favorite-btn" (click)="toggleFavorite(provider.providerId.toString(), $event)">
+              <i class="bi" [class.bi-heart-fill]="isFavorite(provider.providerId.toString())" [class.bi-heart]="!isFavorite(provider.providerId.toString())" [style.color]="isFavorite(provider.providerId.toString()) ? 'var(--red)' : 'var(--muted-2)'"></i>
+            </button>
+            <div class="provider-avatar">
+              @if (provider.profilePic) {
+                <img [src]="provider.profilePic" alt="Avatar">
+              } @else {
+                <i class="bi bi-person-fill" style="font-size: 5rem; color: var(--border); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: var(--surface);"></i>
+              }
+            </div>
+            <h4 style="margin: 12px 0 4px; text-align: center;">{{ provider.fullName }}</h4>
+            <div style="text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 12px;">
+              {{ provider.expertise }}
+            </div>
+            
+            <div class="provider-stats">
+              <div class="stat-item" title="Rating">
+                <i class="bi bi-star-fill text-warning"></i>
+                <span>{{ provider.avgRating ? provider.avgRating : 'New' }}</span>
+              </div>
+              <div class="stat-item" title="Location">
+                <i class="bi bi-geo-alt"></i>
+                <span>{{ provider.location }}</span>
+              </div>
+              <div class="stat-item" title="Experience">
+                <i class="bi bi-briefcase"></i>
+                <span>{{ provider.workExperience }}</span>
+              </div>
+            </div>
+
+            <a [routerLink]="['/customer/provider', provider.providerId.toString()]" class="btn btn-outline-primary" style="width: 100%; margin-top: 16px;">View Profile</a>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

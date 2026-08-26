@@ -1,0 +1,25 @@
+<div class="app-shell">
+
+  <app-sidebar
+    class="sidebar"
+    [class.is-open]="sidebarOpen()"
+    (navClicked)="closeSidebar()">
+  </app-sidebar>
+
+  <!-- Scrim overlay for mobile — (click) closes sidebar -->
+  <div class="scrim" [class.is-open]="sidebarOpen()" (click)="closeSidebar()"></div>
+
+  <!-- Main content area -->
+  <div class="main">
+    <app-topbar
+      class="topbar"
+      (menuToggle)="openSidebar()">
+    </app-topbar>
+
+    <!-- All admin page components are rendered here by the router -->
+    <main class="view-area">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+</div>

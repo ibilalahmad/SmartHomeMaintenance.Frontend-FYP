@@ -1,0 +1,51 @@
+<!-- Complaints View -->
+<div class="view-head">
+  <div>
+    <h1>Complaints</h1>
+    <p>Review, respond, and take action on customer complaints.</p>
+  </div>
+</div>
+
+
+
+<div class="toolbar">
+  <div class="filter-chips">
+    @for (filter of filters; track filter) {
+      <button
+        class="chip"
+        [class.is-active]="activeFilter() === filter"
+        (click)="setFilter(filter)">
+        {{ filter }}
+      </button>
+    }
+  </div>
+</div>
+
+<div class="panel">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Provider</th>
+          <th>Reason</th>
+          <th>Filed On</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of complaints(); track c.customer) {
+          <tr>
+            <td>{{ c.customer }}</td>
+            <td>{{ c.provider }}</td>
+            <td>{{ c.reason }}</td>
+            <td>{{ c.filed }}</td>
+            <td><app-status-badge [status]="c.status"></app-status-badge></td>
+            <td><a class="icon-action text-info" [routerLink]="['/admin/complaints', c.id]"><i class="bi bi-eye"></i></a></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

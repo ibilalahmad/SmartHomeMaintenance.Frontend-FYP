@@ -1,0 +1,213 @@
+<div class="view-head">
+  <div>
+    <a routerLink="/customer/bookings" class="link-quiet" style="display: inline-flex; align-items: center; gap: 4px; margin-bottom: 8px;">
+      <i class="bi bi-arrow-left"></i> Back to Bookings
+    </a>
+    <h1>Booking #{{ booking()?.id || '...' }}</h1>
+  </div>
+</div>
+
+@if (newlyCreated()) {
+  <div style="padding: 16px; background: rgba(34, 197, 94, 0.1); border: 1px solid var(--green); color: var(--green); margin-bottom: 24px; border-radius: 8px; display: flex; align-items: center; gap: 12px; font-weight: 500;">
+    <i class="bi bi-check-circle-fill" style="font-size: 20px;"></i>
+    <div>Your booking was successfully created! The service provider has been notified.</div>
+  </div>
+}
+
+@if (isLoading()) {
+  <div style="padding: 40px; text-align: center; color: var(--muted);">
+    <span class="spinner-border text-primary"></span>
+  </div>
+} @else if (booking()) {
+  <section class="grid-2">
+    <!-- Left Column: Details -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+       <div class="panel">
+          <div class="panel-head">
+            <h2>Service Information</h2>
+          </div>
+          <div style="padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+             <div>
+                <p style="color: var(--muted); font-size: 13px; margin-bottom: 4px;">Service Provider</p>
+                <div style="font-weight: 600;"><i class="bi bi-person-badge" style="color: var(--primary); margin-right: 8px;"></i>{{ booking()!.provider }}</div>
+             </div>
+             <div>
+                <p style="color: var(--muted); font-size: 13px; margin-bottom: 4px;">Service</p>
+                <div style="font-weight: 600;"><i class="bi bi-tools" style="color: var(--primary); margin-right: 8px;"></i>{{ booking()!.service }}</div>
+             </div>
+             <div>
+                <p style="color: var(--muted); font-size: 13px; margin-bottom: 4px;">Date & Time</p>
+                <div style="font-weight: 600;"><i class="bi bi-calendar" style="color: var(--primary); margin-right: 8px;"></i>{{ booking()!.when | date:'medium' }}</div>
+             </div>
+             <div>
+                <p style="color: var(--muted); font-size: 13px; margin-bottom: 4px;">Status</p>
+                <div>
+                   <span class="badge" 
+                         [class.badge--amber]="booking()!.status === 'Pending'"
+                         [class.badge--blue]="booking()!.status === 'Confirmed'"
+                         [class.badge--purple]="booking()!.status === 'In Progress'"
+                         [class.badge--green]="booking()!.status === 'Completed'"
+                         [class.badge--red]="booking()!.status === 'Cancelled'">
+                     {{ booking()!.status }}
+                   </span>
+                </div>
+             </div>
+          </div>
+       </div>
+
+       <div class="panel">
+          <div class="panel-head">
+            <h2>Location Details</h2>
+          </div>
+          <div style="padding: 24px;">
+             <p style="color: var(--muted); font-size: 13px; margin-bottom: 4px;">Address</p>
+             <div style="font-size: 15px;"><i class="bi bi-geo-alt" style="color: var(--primary); margin-right: 8px;"></i>{{ booking()!.address || 'Not provided' }}</div>
+          </div>
+       </div>
+    </div>
+
+    <!-- Right Column: Actions -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+       
+       <!-- Payment Section (Only if completed) -->
+       @if (booking()!.status === 'Completed') {
+         <div class="panel" style="border-top: 3px solid var(--green);">
+            <div class="panel-head">
+              <h2 style="color: var(--green);">Payment Info</h2>
+            </div>
+            <div style="padding: 24px;">
+               @if (booking()!.paymentStatus === 'Paid' || paymentSuccess) {
+                 <div style="padding: 16px; background: rgba(34, 197, 94, 0.1); color: var(--green); border-radius: 8px; text-align: center; font-weight: 600; font-size: 16px;">
+                   <i class="bi bi-check-circle-fill" style="margin-right: 8px;"></i> Payment Completed
+                 </div>
+                 
+                 <div style="margin-top: 24px; text-align: center;">
+                   <p style="color: var(--muted-2); margin-bottom: 12px;">How was the service?</p>
+                   <a routerLink="/customer/rate" class="btn btn-primary" style="width: 100%;">Rate & Review Service</a>
+                 </div>
+               } @else {
+                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                   <span style="font-weight: 500;">Status:</span>
+                   <span class="badge badge--amber">Pending</span>
+                 </div>
+                 
+                 @if (!showPaymentOptions) {
+                    <button class="btn btn-primary" style="width: 100%;" (click)="showPaymentOptions = true">Pay Now</button>
+                 } @else {
+                    <div style="background: var(--bg-1); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+                       <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 12px; color: var(--text);">Select Payment Method</label>
+                       
+                       <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+                         <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 12px; border: 1px solid var(--border); border-radius: 6px;" [style.borderColor]="paymentMethod === 'cash' ? 'var(--primary)' : 'var(--border)'">
+                           <input type="radio" name="payMethod" value="cash" [(ngModel)]="paymentMethod">
+                           <i class="bi bi-cash-stack text-success"></i> Cash on Delivery (Paid to SP directly)
+                         </label>
+                         
+                         <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 12px; border: 1px solid var(--border); border-radius: 6px;" [style.borderColor]="paymentMethod === 'bank' ? 'var(--primary)' : 'var(--border)'">
+                           <input type="radio" name="payMethod" value="bank" [(ngModel)]="paymentMethod">
+                           <i class="bi bi-bank text-primary"></i> Bank Transfer
+                         </label>
+                       </div>
+                       
+                       @if (paymentMethod === 'bank') {
+                          <div style="background: var(--bg-0); padding: 12px; border-radius: 6px; font-size: 13px; margin-bottom: 16px; border: 1px dashed var(--border);">
+                            <strong>Bank Details:</strong><br>
+                            Bank: Meezan Bank<br>
+                            Account Title: {{ booking()!.provider }}<br>
+                            Account Number: 0123456789<br>
+                            IBAN: PK23MEZN000123456789
+                          </div>
+                       }
+
+                       <button class="btn btn-primary" style="width: 100%; margin-bottom: 8px;" [disabled]="!paymentMethod" (click)="confirmPayment()">Confirm Payment</button>
+                       <button class="btn btn-outline" style="width: 100%;" (click)="showPaymentOptions = false">Cancel</button>
+                    </div>
+                 }
+               }
+            </div>
+         </div>
+       }
+
+       <!-- Booking Management -->
+       @if (canCancelOrReschedule()) {
+         <div class="panel">
+            <div class="panel-head">
+              <h2>Manage Booking</h2>
+            </div>
+            
+            <div style="padding: 24px;">
+               <!-- Reschedule -->
+               @if (!showRescheduleForm && !showCancelForm) {
+                 <div style="display: flex; gap: 12px;">
+                   <button class="btn btn-outline" style="flex: 1;" (click)="showRescheduleForm = true">Reschedule</button>
+                   <button class="btn btn-outline" style="flex: 1; color: var(--red); border-color: var(--red);" (click)="showCancelForm = true">Cancel</button>
+                 </div>
+               }
+               
+               <!-- Reschedule Form -->
+               @if (showRescheduleForm) {
+                 <div style="background: var(--bg-1); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+                    <h4 style="font-size: 15px; margin-bottom: 12px;">Request Reschedule</h4>
+                    <div style="margin-bottom: 12px;">
+                      <label style="display: block; font-size: 13px; margin-bottom: 6px;">New Date</label>
+                      <input type="date" class="form-control" style="width: 100%; padding: 8px;" [(ngModel)]="newDate">
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                      <label style="display: block; font-size: 13px; margin-bottom: 6px;">New Time Slot</label>
+                      <select class="form-control" style="width: 100%; padding: 8px;" [(ngModel)]="newTime">
+                        <option value="09:00 AM">09:00 AM - 10:00 AM</option>
+                        <option value="11:00 AM">11:00 AM - 12:00 PM</option>
+                        <option value="02:00 PM">02:00 PM - 03:00 PM</option>
+                      </select>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                      <button class="btn btn-primary" style="flex: 1;" [disabled]="!newDate || !newTime" (click)="submitReschedule()">Submit</button>
+                      <button class="btn btn-outline" style="flex: 1;" (click)="showRescheduleForm = false">Back</button>
+                    </div>
+                 </div>
+               }
+
+               <!-- Cancel Form -->
+               @if (showCancelForm) {
+                 <div style="background: rgba(239, 68, 68, 0.05); padding: 16px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3);">
+                    <h4 style="font-size: 15px; margin-bottom: 12px; color: var(--red);">Cancel Booking</h4>
+                    <p style="font-size: 12px; color: var(--muted-2); margin-bottom: 12px;">Cancellations within 2 hours of the scheduled time are not allowed.</p>
+                    
+                    <div style="margin-bottom: 16px;">
+                      <label style="display: block; font-size: 13px; margin-bottom: 6px;">Reason for Cancellation *</label>
+                      <select class="form-control" style="width: 100%; padding: 8px;" [(ngModel)]="cancelReason">
+                        <option value="Found another provider">Found another provider</option>
+                        <option value="Changed mind">Changed mind</option>
+                        <option value="Emergency">Emergency</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                      <button class="btn btn-primary" style="flex: 1; background: var(--red); border-color: var(--red);" [disabled]="!cancelReason" (click)="submitCancel()">Confirm Cancel</button>
+                      <button class="btn btn-outline" style="flex: 1;" (click)="showCancelForm = false">Back</button>
+                    </div>
+                 </div>
+               }
+            </div>
+         </div>
+       }
+
+       <!-- Support -->
+       <div class="panel">
+          <div class="panel-head">
+            <h2>Support</h2>
+          </div>
+          <div style="padding: 24px;">
+            <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">Have an issue with this service? You can file a complaint to our admin team.</p>
+            <a routerLink="/customer/complaints" class="btn btn-outline" style="width: 100%;">File a Complaint</a>
+          </div>
+       </div>
+
+    </div>
+  </section>
+} @else {
+  <div class="panel text-center p-5">
+    <h3>Booking Not Found</h3>
+    <a routerLink="/customer/bookings" class="btn btn-primary mt-3">Back to Bookings</a>
+  </div>
+}
